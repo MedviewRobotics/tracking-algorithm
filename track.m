@@ -13,6 +13,10 @@ readerLeft = VideoReader(videoFileLeft)
 readerRight = VideoReader(videoFileRight)
 player = vision.VideoPlayer('Position', [20, 200, 740 560])
 
+%% 
+v = VideoReader('Trial1_VideoLeft_Trim.mp4');
+vision.VideoPlayer;
+implay('Trial1_VideoLeft_Trim.mp4')
 %% Read and Rectify Video Frames
 % left and right video must be rectified to compute disparity and
 % reconstruct the 3-D scene
@@ -23,9 +27,9 @@ frameRight = readFrame(readerRight)
 [frameLeftRect,frameRightRect] = rectifyStereoImages(frameLeft,frameRight,...
     stereoParams)
 
-figure;
-imshow(stereoAnaglyph(frameLeftRect,frameRightRect))
-title('Rectified Video Frames')
+% figure;
+% imshow(stereoAnaglyph(frameLeftRect,frameRightRect))
+% title('Rectified Video Frames')
 
 %% Compute Disparity
 % match ecorresponding points in stereo images on same pixel row.
@@ -36,11 +40,11 @@ frameLeftGray = rgb2gray(frameLeftRect);
 frameRightGray = rgb2gray(frameRightRect);
 
 disparityMap = disparitySGM(frameLeftGray,frameRightGray)
-figure
-imshow(disparityMap,[0 64]);
-title('Disparity Map')
-colormap jet
-colorbar
+% figure
+% imshow(disparityMap,[0 64]);
+% title('Disparity Map')
+% colormap jet
+% colorbar
 
 %% 3-D Reconstruct scene
 
@@ -56,7 +60,7 @@ player3D = pcplayer([-3,3],[-3,3],[0,8],'VerticalAxis','y',...
     'VerticalAxisDir','Down')
 
 % Visualize the point cloud
-view(player3D,ptCloud);
+%view(player3D,ptCloud);
 
 
 %% Detect people in left image THIS IS WHERE CHANGES SHOULD BE MADE
@@ -107,15 +111,25 @@ frameRight = readFrame(readerRight);
 
 %convert to greyscale
 frameLeftGray = rgb2gray(frameLeftRect);
+frameRightGray = rgb2gray(frameRightRect);
 
 %Compute to disparity
-disparityMap = disparitySGM(frameLeftGray,frameRightGray);
+%disparityMap = disparitySGM(frameLeftGray,frameRightGray);
+disparityMap = disparityBM(frameLeftGray,frameRightGray);
 
 % Reconstruct 3-D scene
 points3D = reconstructScene(disparityMap,stereoParams);
 points3D = points3D./1000;
-ptCloud = pointCloud(points3D,'Color',frameLeftRect);
-view(player3D,ptCloud);
+%ptCloud = pointCloud(points3D,'Color',frameLeftRect);
+
+% Create a streaming point cloud viewer
+%player3D = pcplayer([-3,3],[-3,3],[0,8],'VerticalAxis','y',...
+%    'VerticalAxisDir','Down');
+
+% Visualize the point cloud
+%view(player3D,ptCloud);
+
+%table(points3D(1:514))
 
 %detect people
 bboxes = peopleDetector.step(frameLeftGray);
