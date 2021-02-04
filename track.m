@@ -1,35 +1,38 @@
-% Stereovision object tracking and depth estimation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% BME70B: Biomedical Engineering Capstone Design
+% AT03 Robotic Automated Microscopy Calibration and Tracking
+%
+% Author #1: Mohammad Aziz Uddin - 500754765 (Tracking algorithm)
+% Author #2: Ginette Hartell - 500755250 (Calibration)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-load('handshakeStereoParams.mat')
-%% Show camera parameters
-showExtrinsics(stereoParams)
+%% Add relevant paths and load stereoParams if already calibrated
+addpath(genpath('Trials 10-11'));
+load('stereoParams10.mat')
 
-%% Define left and right camera videos
+%% Import videos to workspace
+readerLeft= VideoReader('myVideoLeftTrial10.avi');
+readerRight= VideoReader('myVideoRightTrial10.avi');
 
-videoFileLeft = 'handshake_left.avi'
-videoFileRight = 'handshake_right.avi'
+%% Calculate camera parameters using calibration image pairs 
+%Call stereoCalibrate Function
+% [stereoParams, estimationErrors] = stereoCalibrate();
 
-readerLeft = VideoReader(videoFileLeft)
-readerRight = VideoReader(videoFileRight)
-player = vision.VideoPlayer('Position', [20, 200, 740 560])
-
-%% 
-v = VideoReader('Trial1_VideoLeft_Trim.mp4');
-vision.VideoPlayer;
-implay('Trial1_VideoLeft_Trim.mp4')
 %% Read and Rectify Video Frames
 % left and right video must be rectified to compute disparity and
 % reconstruct the 3-D scene
 
-frameLeft = readFrame (readerLeft)
-frameRight = readFrame(readerRight)
+frameLeft = readFrame(readerLeft);
+frameRight = readFrame(readerRight);
+
+imshowpair(frameLeft,frameRight)
 
 [frameLeftRect,frameRightRect] = rectifyStereoImages(frameLeft,frameRight,...
-    stereoParams)
+    stereoParams);
 
-% figure;
-% imshow(stereoAnaglyph(frameLeftRect,frameRightRect))
-% title('Rectified Video Frames')
+figure;
+imshow(stereoAnaglyph(frameLeftRect,frameRightRect))
+title('Rectified Video Frames')
 
 %% Compute Disparity
 % match ecorresponding points in stereo images on same pixel row.
@@ -39,36 +42,98 @@ frameRight = readFrame(readerRight)
 frameLeftGray = rgb2gray(frameLeftRect);
 frameRightGray = rgb2gray(frameRightRect);
 
-disparityMap = disparitySGM(frameLeftGray,frameRightGray)
-% figure
-% imshow(disparityMap,[0 64]);
-% title('Disparity Map')
-% colormap jet
-% colorbar
+% 
+frameLeftGray_eq = histeq(frameLeftGray);
+figure;imshowpair(frameLeftGray,frameLeftGray_eq,'montage')
+
+figure;subplot(121);imhist(frameLeftGray);subplot(122);imhist(frameLeftGray_eq);
+
+disparityMap = disparitySGM(frameLeftGray,frameRightGray);
+figure
+imshow(disparityMap,[0 64]);
+title('Disparity Map')
+colormap jet
+colorbar
 
 %% 3-D Reconstruct scene
 
 points3D = reconstructScene(disparityMap,stereoParams);
 
-
 % Convert to meters and create a pointCloud object
 points3D = points3D ./ 1000; % 
-ptCloud = pointCloud(points3D,'Color',frameLeftRect)
+ptCloud = pointCloud(points3D,'Color',frameLeftRect);
 
 % Create a streaming point cloud viewer
 player3D = pcplayer([-3,3],[-3,3],[0,8],'VerticalAxis','y',...
-    'VerticalAxisDir','Down')
+    'VerticalAxisDir','Down');
 
 % Visualize the point cloud
-%view(player3D,ptCloud);
+view(player3D,ptCloud);
 
 
-%% Detect people in left image THIS IS WHERE CHANGES SHOULD BE MADE
+%% Tracker detection demonstration:
 
-peopleDetector = vision.PeopleDetector('MinSize',[166 83]);
+% To play tracking video
+player = vision.DeployableVideoPlayer('Location',[10,100]);
+v = VideoWriter('OTS_Demo1.mp4');
+open(v)
+% Thresholds determined experimentally and through colorThresholder App
+redThresh = 0.208; % Threshold for red detection
+greenThresh = 0.224; % Threshold for green detection
+blueThresh = 0.244; % Threshold for blue detection
 
-% Detect people
-bboxes = peopleDetector.step(frameLeftGray)
+%Blob analysis --> Analyze binary image and determine size, shape,
+%centroid, bouding box
+hblob = vision.BlobAnalysis('AreaOutputPort', false, ... % Set blob analysis handling
+                                'CentroidOutputPort', true, ... 
+                                'BoundingBoxOutputPort', true', ...
+                                'MinimumBlobArea', 1, ...
+                                'MaximumBlobArea', 20000, ...
+                                'MaximumCount',3);
+                            
+%radii for disk structural element in Image dilation (determined
+%experimentally)
+radius_red = 1;
+radius_green = 10;
+radius_blue = 1;                            
+
+%Marker tracking 
+while hasFrame(readerLeft)
+    
+    %Find markers
+    image = readFrame(readerLeft);
+    [binFrameRed,redCentroids] = detectmarkerColor(image,redThresh,1,radius_red);
+    [binFrameGreen,greenCentroids] = detectmarkerColor(image,greenThresh,2,radius_green);
+    [binFrameBlue,blueCentroids] = detectmarkerColor(image,blueThresh,3,radius_blue);
+    
+    %Blob Analysis of each color
+    [centroidRed,bboxRed] = step(hblob,binFrameRed);
+    [centroidGreen,bboxGreen] = step(hblob,binFrameGreen);
+    [centroidBlue,bboxBlue] = step(hblob,binFrameBlue);
+
+     %RED
+     rgb = insertShape(image,'rectangle',bboxRed(1,:),'Color','red',...
+         'LineWidth',3);
+     %GREEN
+     rgb = insertShape(rgb,'rectangle',bboxGreen(1,:),'Color','green',...
+         'LineWidth',3);
+     %BLUE
+     rgb = insertShape(rgb,'rectangle',bboxBlue(1,:),'Color','blue',...
+         'LineWidth',3);
+     rgb = insertText(rgb,centroidRed(1,:) + 20,['X: ' num2str(round(centroidRed(1,1)),'%d')...
+         ' Y: ' num2str(round(centroidRed(1,2)),'%d')],'FontSize',18);
+     rgb = insertText(rgb,centroidGreen(1,:)+15,['X: ' num2str(round(centroidGreen(1,1)),'%d')...
+         ' Y: ' num2str(round(centroidGreen(1,2)),'%d')],'FontSize',18);
+     rgb = insertText(rgb,centroidBlue(1,:)-75,['X: ' num2str(round(centroidBlue(1,1)),'%d')...
+         ' Y: ' num2str(round(centroidBlue(1,2)),'%d')],'FontSize',18);
+     
+     player(rgb);
+     writeVideo(v,rgb);
+end
+
+release(player);
+close(v);
+
 
 %% Distance of each person to camera
 
