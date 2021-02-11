@@ -1,4 +1,4 @@
-function [bw2,centroids] = detectmarkerColor(img,threshold,RGB_channel,radius)
+function [bw2,centroids,diffFrameColor] = detectmarkerColor(img,threshold,RGB_channel,radius)
 
 diffFrameColor= imsubtract(img(:,:,RGB_channel), rgb2gray(img)); % Get color component of the image
 diffFrameColor = medfilt2(diffFrameColor, [3 3]); % Filter out the noise by using median filter
