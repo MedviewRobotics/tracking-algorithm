@@ -37,7 +37,7 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ... % Set blob analysis han
                                 'MaximumBlobArea', 20000, ...
                                 'MaximumCount',3);
 %Initialize controls
-% [output?] = initializeMicroscope()
+q0 = initializeMicroscope();
 
 %% Marker tracking and robot movement
 
@@ -112,7 +112,7 @@ pause(0.2)
 writeVideo(v,rgb);
 
 % Send to Control System
-% moveMicrosope(inputs)
+newq0 = moveMicroscope(input_x,input_y,input_z,q0);
 
 end
 

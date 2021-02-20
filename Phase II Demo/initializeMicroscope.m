@@ -1,4 +1,4 @@
-function [] = initializeMicroscope()
+function q0 = initializeMicroscope()
 
 % Initialize Toolbox (Robotics Toolbox for MATLAB (release 10.4))
 startup_rvc;
@@ -22,26 +22,6 @@ start_pos_new = [0 3.14/2 0 0 -3.14/2 0]
 T_start = AT03.fkine(start_pos_new)
 RPY = tr2rpy(T_start) 
 [X,Y,Z] = transl(T_start)
-
-% Initialize RNG
-
-rng(0,'twister');
-a = 45;
-b = 65;
-rx = (b-a).*rand(1000,1) + a;
-r_range = [min(r) max(r)]
-
-rng(0,'twister');
-a = -20;
-b = 20;
-ry = (b-a).*rand(1000,1) + a;
-r_range = [min(r) max(r)]
-
-rng(0,'twister');
-a = 105;
-b = 125;
-rz = (b-a).*rand(1000,1) + a;
-r_range = [min(r) max(r)]
 
 % Initialize 
 % start_pos_new = [0 3.14/2 0 0 -3.14/2 0]
