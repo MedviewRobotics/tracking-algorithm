@@ -1,4 +1,4 @@
-function q0 = initializeMicroscope()
+function [AT03,q0] = initializeMicroscope()
 
 % Initialize Toolbox (Robotics Toolbox for MATLAB (release 10.4))
 startup_rvc;
@@ -17,11 +17,11 @@ L(6)=Link ([0 5.5 0 0]);
 AT03=SerialLink(L,'name','AT03Robot');
 AT03.model3d = 'CAPSTONE\AT03';
 %start_pos=[0,1.571/2,1.571,-1.571,-1.571/2,0];
-start_pos_new = [0 3.14/2 0 0 -3.14/2 0]
+start_pos_new = [0 3.14/2 0 0 -3.14/2 0];
 %AT03.offset=[0 0 0 0 0 0];
-T_start = AT03.fkine(start_pos_new)
-RPY = tr2rpy(T_start) 
-[X,Y,Z] = transl(T_start)
+T_start = AT03.fkine(start_pos_new);
+RPY = tr2rpy(T_start);
+[X,Y,Z] = transl(T_start);
 
 % Initialize 
 % start_pos_new = [0 3.14/2 0 0 -3.14/2 0]

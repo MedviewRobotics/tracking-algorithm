@@ -5,7 +5,7 @@
 %
 % Author #1: Ginette Hartell - 500755250
 % Author #2: Mohammad Aziz Uddin - 500754765
-% Author #3: Jay Tailor
+% Author #3: Jay Tailor - 500750496
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Initialization
@@ -14,7 +14,7 @@ addpath(genpath('Phase 1'));
 readerLeft= VideoReader('myVideoLeftTrial9.avi');
 readerRight= VideoReader('myVideoRightTrial9.avi');
 
-[stereoParams, estimationErrors] = stereoCalibrate();
+%[stereoParams, estimationErrors] = stereoCalibrate();
 
 player = vision.DeployableVideoPlayer('Location',[10,100]);
 v = VideoWriter('xyz_all_markers.mp4');
@@ -36,11 +36,15 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ... % Set blob analysis han
                                 'MinimumBlobArea', 1, ...
                                 'MaximumBlobArea', 20000, ...
                                 'MaximumCount',3);
-%Initialize controls
-q0 = initializeMicroscope();
+
+[Robot,q0] = initializeMicroscope();
 
 %% Marker tracking and robot movement
-
+% player = vision.DeployableVideoPlayer('Location',[10,100]);
+% v = VideoWriter('xyz_all_markers.mp4');
+% v.FrameRate = 30;
+% open(v)
+tic;
 while hasFrame(readerLeft) && hasFrame(readerRight)
 
 frameLeft = readFrame(readerLeft);
@@ -107,15 +111,19 @@ rgb = insertText(rgb,centroidGreenLeft(1,:)+15,['X: ' num2str(round(centroidGree
 rgb = insertText(rgb,centroidBlueLeft(1,:)-75,['X: ' num2str(round(centroidBlueLeft(1,1)),'%d')...
 ' Y: ' num2str(round(centroidBlueLeft(1,2)),'%d') ' Z: ' distanceAsStringBLUE],'FontSize',18);
 
-player(rgb);
-pause(0.2)
-writeVideo(v,rgb);
+% player(rgb);
+% pause(0.2)
+% writeVideo(v,rgb);
 
 % Send to Control System
-newq0 = moveMicroscope(input_x,input_y,input_z,q0);
+input_x = centroidBlueLeft(1,1)/10;
+input_y = centroidBlueLeft(1,2)/10;
+input_z = 120;
+q0 = moveMicroscope(input_x,input_y,input_z,q0,Robot);
 
 end
+toc;
 
-release(player)
-close(v);
+% release(player)
+% close(v);
 
