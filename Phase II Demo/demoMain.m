@@ -48,12 +48,9 @@ tic;
 while hasFrame(readerLeft) && hasFrame(readerRight)
 
 frameLeft = readFrame(readerLeft);
-%frameLeft = undistortImage(frameLeft,stereoParams.CameraParameters1);
-
 frameRight = readFrame(readerRight);
-%frameRight = undistortImage(frameRight,stereoParams.CameraParameters2);
 
-%detect colored markers for each camera
+%Setect colored markers for each camera
 %LEFT
 [binFrameRedLeft,redCentroidsLeft] = detectmarkerColor(frameLeft,redThresh,1,radius_red);
 [binFrameGreenLeft,greenCentroidsLeft] = detectmarkerColor(frameLeft,greenThresh,2,radius_green);
@@ -74,25 +71,15 @@ frameRight = readFrame(readerRight);
 [centroidGreenRight,bboxGreenRight] = step(hblob,binFrameGreenRight);
 [centroidBlueRight,bboxBlueRight] = step(hblob,binFrameBlueRight);
 
-
 %Z IN WORLD COORDINATES FOR RED
 point3dRED = triangulate(centroidRedLeft(1,:),centroidRedRight(1,:),stereoParams);
-%distanceInMetersRED = norm(point3dRED)/1000;
-distanceInMetersRED = norm(point3dRED);
-%distanceAsStringRED = sprintf('%0.2f meters', distanceInMetersRED);
-distanceAsStringRED = sprintf('%d',round(distanceInMetersRED));
 
 %Z IN WORLD COORDINATES FOR GREEN
 point3dGREEN = triangulate(centroidGreenLeft(1,:),centroidGreenRight(1,:),stereoParams);
-%distanceInMetersGREEN = norm(point3dGREEN)/1000;
-distanceInMetersGREEN = norm(point3dGREEN);
-distanceAsStringGREEN = sprintf('%d',round(distanceInMetersGREEN));
 
 %Z IN WORLD COORDINATES FOR BLUE
 point3dBLUE = triangulate(centroidBlueLeft(1,:),centroidBlueRight(1,:),stereoParams);
-%distanceInMetersBLUE = norm(point3dBlue)/1000;
-distanceInMetersBLUE = norm(point3dBLUE);
-distanceAsStringBLUE = sprintf('%d',round(distanceInMetersBLUE));
+
 
 %RED
 rgb = insertShape(frameLeft,'rectangle',bboxRedLeft(1,:),'Color','red',...
@@ -104,22 +91,21 @@ rgb = insertShape(rgb,'rectangle',bboxGreenLeft(1,:),'Color','green',...
 rgb = insertShape(rgb,'rectangle',bboxBlueLeft(1,:),'Color','blue',...
 'LineWidth',3);
 
+%Convert to world coordinates
+[x_output, y_output, z_output, z_out_string] = pixel2World(centroidBlueLeft(1,1), centroidBlueLeft(1,2), point3dBLUE)
+
 rgb = insertText(rgb,centroidRedLeft(1,:) + 20,['X: ' num2str(round(centroidRedLeft(1,1)),'%d')...
 ' Y: ' num2str(round(centroidRedLeft(1,2)),'%d') ' Z: ' distanceAsStringRED],'FontSize',18);
 rgb = insertText(rgb,centroidGreenLeft(1,:)+15,['X: ' num2str(round(centroidGreenLeft(1,1)),'%d')...
 ' Y: ' num2str(round(centroidGreenLeft(1,2)),'%d') ' Z: ' distanceAsStringGREEN] ,'FontSize',18);
 rgb = insertText(rgb,centroidBlueLeft(1,:)-75,['X: ' num2str(round(centroidBlueLeft(1,1)),'%d')...
-' Y: ' num2str(round(centroidBlueLeft(1,2)),'%d') ' Z: ' distanceAsStringBLUE],'FontSize',18);
-
+' Y: ' num2str(round(centroidBlueLeft(1,2)),'%d') ' Z: ' z_out_string],'FontSize',18);
 % player(rgb);
 % pause(0.2)
 % writeVideo(v,rgb);
 
 % Send to Control System
-input_x = centroidBlueLeft(1,1)/10;
-input_y = centroidBlueLeft(1,2)/10;
-input_z = 120;
-q0 = moveMicroscope(input_x,input_y,input_z,q0,Robot);
+q0 = moveMicroscope(x_output, y_output, z_output,q0,Robot);
 
 end
 toc;
