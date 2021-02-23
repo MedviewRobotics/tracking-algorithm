@@ -40,10 +40,10 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ... % Set blob analysis han
 [Robot,q0] = initializeMicroscope();
 
 %% Marker tracking and robot movement
-% player = vision.DeployableVideoPlayer('Location',[10,100]);
-% v = VideoWriter('xyz_all_markers.mp4');
-% v.FrameRate = 30;
-% open(v)
+player = vision.DeployableVideoPlayer('Location',[10,100]);
+v = VideoWriter('xyz_all_markers.mp4');
+v.FrameRate = 30;
+open(v)
 tic;
 while hasFrame(readerLeft) && hasFrame(readerRight)
 
@@ -61,51 +61,45 @@ frameRight = readFrame(readerRight);
 [binFrameBlueRight,blueCentroidsRight] = detectmarkerColor(frameRight,blueThresh,3,radius_blue);
 
 %Blob Analysis of each color
-%LEFT
+%Left
 [centroidRedLeft,bboxRedLeft] = step(hblob,binFrameRedLeft);
 [centroidGreenLeft,bboxGreenLeft] = step(hblob,binFrameGreenLeft);
 [centroidBlueLeft,bboxBlueLeft] = step(hblob,binFrameBlueLeft);
-
 %Right
 [centroidRedRight,bboxRedRight] = step(hblob,binFrameRedRight);
 [centroidGreenRight,bboxGreenRight] = step(hblob,binFrameGreenRight);
 [centroidBlueRight,bboxBlueRight] = step(hblob,binFrameBlueRight);
 
-%Z IN WORLD COORDINATES FOR RED
+%Computing 3D Coordinates
 point3dRED = triangulate(centroidRedLeft(1,:),centroidRedRight(1,:),stereoParams);
-
-%Z IN WORLD COORDINATES FOR GREEN
 point3dGREEN = triangulate(centroidGreenLeft(1,:),centroidGreenRight(1,:),stereoParams);
-
-%Z IN WORLD COORDINATES FOR BLUE
 point3dBLUE = triangulate(centroidBlueLeft(1,:),centroidBlueRight(1,:),stereoParams);
 
-
-%RED
+%Generating Bounding Boxes
 rgb = insertShape(frameLeft,'rectangle',bboxRedLeft(1,:),'Color','red',...
-'LineWidth',3);
-%GREEN
+'LineWidth',3);%Red
 rgb = insertShape(rgb,'rectangle',bboxGreenLeft(1,:),'Color','green',...
-'LineWidth',3);
-%BLUE
+'LineWidth',3);%Green
 rgb = insertShape(rgb,'rectangle',bboxBlueLeft(1,:),'Color','blue',...
-'LineWidth',3);
+'LineWidth',3);%Blue
 
-%Convert to world coordinates
-[x_output, y_output, z_output, z_out_string] = pixel2World(centroidBlueLeft(1,1), centroidBlueLeft(1,2), point3dBLUE)
+%Plotting output in world coordinates
+rgb = insertText(rgb,centroidRedLeft(1,:) + 20,['X: ' num2str(round(point3dRED(1)),'%d')...
+' Y: ' num2str(round(point3dRED(2)),'%d') ' Z: ' num2str(round(point3dRED(3)))],'FontSize',18);
+rgb = insertText(rgb,centroidGreenLeft(1,:)+15,['X: ' num2str(round(point3dGREEN(1)),'%d')...
+' Y: ' num2str(round(point3dGREEN(2)),'%d') ' Z: ' num2str(round(point3dGREEN(3)))] ,'FontSize',18);
+rgb = insertText(rgb,centroidBlueLeft(1,:)-75,['X: ' num2str(round(point3dBLUE(1)),'%d')...
+' Y: ' num2str(round(point3dBLUE(2)),'%d') ' Z: ' num2str(round(point3dBLUE(3)))],'FontSize',18);
 
-rgb = insertText(rgb,centroidRedLeft(1,:) + 20,['X: ' num2str(round(centroidRedLeft(1,1)),'%d')...
-' Y: ' num2str(round(centroidRedLeft(1,2)),'%d') ' Z: ' distanceAsStringRED],'FontSize',18);
-rgb = insertText(rgb,centroidGreenLeft(1,:)+15,['X: ' num2str(round(centroidGreenLeft(1,1)),'%d')...
-' Y: ' num2str(round(centroidGreenLeft(1,2)),'%d') ' Z: ' distanceAsStringGREEN] ,'FontSize',18);
-rgb = insertText(rgb,centroidBlueLeft(1,:)-75,['X: ' num2str(round(centroidBlueLeft(1,1)),'%d')...
-' Y: ' num2str(round(centroidBlueLeft(1,2)),'%d') ' Z: ' z_out_string],'FontSize',18);
-% player(rgb);
-% pause(0.2)
-% writeVideo(v,rgb);
+player(rgb);
+pause(0.2)
+writeVideo(v,rgb);
+
+% World to Microscope Coordinate Mapping (for blue coordinates)
+[xMicroscope, yMicroscope, zMicroscope] = world2Microscope(point3dBLUE(1), point3dBLUE(2), point3dBLUE(3))
 
 % Send to Control System
-q0 = moveMicroscope(x_output, y_output, z_output,q0,Robot);
+q0 = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
 
 end
 toc;
