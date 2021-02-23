@@ -23,20 +23,9 @@ T_start = AT03.fkine(start_pos_new);
 RPY = tr2rpy(T_start);
 [X,Y,Z] = transl(T_start);
 
-x = 125; %new pose stream in
-y = -71; %new pose _ stream in
-z = 65; %new pose _ stream in
-R = 3.1416;
-P = 0;
-Y = 0;
-% Get q_new to move to new pose
-T_start = transl(x,y,z) * rpy2tr(R,P,Y);
-q0 = start_pos_new;
-qf = AT03.ikine(T_start,'q0',q0);
-
 % Initialize 
 % start_pos_new = [0 3.14/2 0 0 -3.14/2 0]
-q0 = qf; %first q0 to give starting pose.
+q0 = start_pos_new; %first q0 to give starting pose.
 i=1;
 end
 
