@@ -38,6 +38,7 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ... % Set blob analysis han
                                 'MaximumCount',3);
 
 [Robot,q0] = initializeMicroscope();
+%test
 
 %% Marker tracking and robot movement
 player = vision.DeployableVideoPlayer('Location',[10,100]);
