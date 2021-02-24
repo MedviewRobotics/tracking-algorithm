@@ -10,16 +10,11 @@
 
 %% Initialization
 addpath(genpath('Phase 1'));
-
+load("stereoParams.mat")
 readerLeft= VideoReader('myVideoLeftTrial9.avi');
 readerRight= VideoReader('myVideoRightTrial9.avi');
 
 %[stereoParams, estimationErrors] = stereoCalibrate();
-
-player = vision.DeployableVideoPlayer('Location',[10,100]);
-v = VideoWriter('xyz_all_markers.mp4');
-v.FrameRate = 30;
-open(v)
 
 redThresh = 0.24; % Threshold for red detection
 greenThresh = 0.18; % Threshold for green detection
@@ -56,6 +51,7 @@ frameRight = readFrame(readerRight);
 [binFrameRedLeft,redCentroidsLeft] = detectmarkerColor(frameLeft,redThresh,1,radius_red);
 [binFrameGreenLeft,greenCentroidsLeft] = detectmarkerColor(frameLeft,greenThresh,2,radius_green);
 [binFrameBlueLeft,blueCentroidsLeft] = detectmarkerColor(frameLeft,blueThresh,3,radius_blue);
+
 %RIGHT
 [binFrameRedRight,redCentroidsRight] = detectmarkerColor(frameRight,redThresh,1,radius_red);
 [binFrameGreenRight,greenCentroidsRight] = detectmarkerColor(frameRight,greenThresh,2,radius_green);
@@ -76,7 +72,9 @@ point3dRED = triangulate(centroidRedLeft(1,:),centroidRedRight(1,:),stereoParams
 point3dGREEN = triangulate(centroidGreenLeft(1,:),centroidGreenRight(1,:),stereoParams);
 point3dBLUE = triangulate(centroidBlueLeft(1,:),centroidBlueRight(1,:),stereoParams);
 
-%Generating Bounding Boxes
+
+%RED
+
 rgb = insertShape(frameLeft,'rectangle',bboxRedLeft(1,:),'Color','red',...
 'LineWidth',3);%Red
 rgb = insertShape(rgb,'rectangle',bboxGreenLeft(1,:),'Color','green',...
@@ -98,6 +96,7 @@ writeVideo(v,rgb);
 
 % World to Microscope Coordinate Mapping (for blue coordinates)
 [xMicroscope, yMicroscope, zMicroscope] = world2Microscope(point3dBLUE(1), point3dBLUE(2), point3dBLUE(3))
+
 
 % Send to Control System
 q0 = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
