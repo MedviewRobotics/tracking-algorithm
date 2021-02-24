@@ -4,7 +4,7 @@ addpath(genpath('Trial 18-19'));
 load("stereoParams18.mat")
 
 readerLeft= VideoReader('myVideoLeftPivot7.avi');
-readerRight = VideoReader('myVideoLeftPivot7.avi');
+readerRight = VideoReader('myVideoRightPivot7.avi');
 
 player = vision.DeployableVideoPlayer('Location',[10,100]);
 v = VideoWriter('pivot.avi');
@@ -19,7 +19,9 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ... % Set blob analysis han
                                 'MaximumCount',3);
 %% Tracking using Grayscale thresholding
 
-point3d_coord(235,3) = 0;
+point3d_coord_1(235,3) = 0;
+point3d_coord_2(235,3) = 0;
+point3d_coord_3(235,3) = 0;
 count = 1;
 
 while hasFrame(readerLeft) && hasFrame(readerRight)
@@ -42,7 +44,6 @@ img_right = frameRightGray > threshold;%figure;imshow(img_cut)
 BW_right = bwareafilt(img_right, 3); % Extract largest blob.
 [centroidRight,bboxRight] = step(hblob,BW_right);
 
-
 %Triangulate for all three markers
 
 point3d_1 = triangulate(centroidRight(1,:),centroidLeft(1,:),stereoParams18);
@@ -50,9 +51,17 @@ point3d_2 = triangulate(centroidRight(2,:),centroidLeft(2,:),stereoParams18);
 point3d_3 = triangulate(centroidRight(3,:),centroidLeft(3,:),stereoParams18);
 
 %Store marker coordinates into frame
-point3d_coord(count,1) = point3d_1(1,1);
-point3d_coord(count,2) = point3d_1(1,2);
-point3d_coord(count,3) = point3d_1(1,3);
+point3d_coord_1(count,1) = point3d_1(1,1);
+point3d_coord_1(count,2) = point3d_1(1,2);
+point3d_coord_1(count,3) = point3d_1(1,3);
+
+point3d_coord_2(count,1) = point3d_2(1,1);
+point3d_coord_2(count,2) = point3d_2(1,2);
+point3d_coord_2(count,3) = point3d_2(1,3);
+
+point3d_coord_3(count,1) = point3d_3(1,1);
+point3d_coord_3(count,2) = point3d_3(1,2);
+point3d_coord_3(count,3) = point3d_3(1,3);
 
 
 rgb = insertShape(frameLeft,'rectangle',bboxLeft(1,:),'Color','black',...
@@ -73,7 +82,6 @@ rgb = insertText(rgb,centroidLeft(2,:) + 50,['X: ' num2str(round(point3d_2(1,1))
 rgb = insertText(rgb,centroidLeft(3,:) - 50,['X: ' num2str(round(point3d_3(1,1)),'%d')...
 ' Y: ' num2str(round(point3d_3(1,2)),'%d') ' Z: ' num2str(round(point3d_3(1,3)))],'FontSize',18);
 
-    
 player(rgb);
 writeVideo(v,rgb);    
 
@@ -84,9 +92,24 @@ end
 release(player)
 close(v);  
 
-[x_tip,y_tip,z_tip] = pivotCalibrate(point3d_coord);
+[x_tip_1,y_tip_1,z_tip_1] = pivotCalibrate(point3d_coord_1);
+[x_tip_2,y_tip_2,z_tip_2] = pivotCalibrate(point3d_coord_2);
+[x_tip_3,y_tip_3,z_tip_3] = pivotCalibrate(point3d_coord_3);
 
-tip_coord = [x_tip,y_tip,z_tip];
+x_tip = mean(x_tip_1, x_tip_2, x_tip_3);
+y_tip = mean(y_tip_1, y_tip_2, y_tip_3);
+z_tip = mean(z_tip_1, z_tip_2, z_tip_3);
+
+%tip_coord = [x_tip,y_tip,z_tip];
+
+figure
+plot3((point3d_3(1,1)), (point3d_3(1,2)), (point3d_3(1,3)), 'ro');
+hold on
+plot3((point3d_2(1,1)), (point3d_2(1,2)), (point3d_2(1,3)), 'bo');
+plot3((point3d_1(1,1)), (point3d_1(1,2)), (point3d_1(1,3)), 'go');
+plot3(x_tip_3,z_tip_3, y_tip_3, 'mo');
+%cam = plotCamera;
+hold off
 
 %% World to Pixel coordinate % not functioning yet
 
