@@ -10,16 +10,11 @@
 
 %% Initialization
 addpath(genpath('Phase 1'));
-
+load("stereoParams.mat")
 readerLeft= VideoReader('myVideoLeftTrial9.avi');
 readerRight= VideoReader('myVideoRightTrial9.avi');
 
 %[stereoParams, estimationErrors] = stereoCalibrate();
-
-player = vision.DeployableVideoPlayer('Location',[10,100]);
-v = VideoWriter('xyz_all_markers.mp4');
-v.FrameRate = 30;
-open(v)
 
 redThresh = 0.24; % Threshold for red detection
 greenThresh = 0.18; % Threshold for green detection
@@ -55,6 +50,7 @@ frameRight = readFrame(readerRight);
 [binFrameRedLeft,redCentroidsLeft] = detectmarkerColor(frameLeft,redThresh,1,radius_red);
 [binFrameGreenLeft,greenCentroidsLeft] = detectmarkerColor(frameLeft,greenThresh,2,radius_green);
 [binFrameBlueLeft,blueCentroidsLeft] = detectmarkerColor(frameLeft,blueThresh,3,radius_blue);
+
 %RIGHT
 [binFrameRedRight,redCentroidsRight] = detectmarkerColor(frameRight,redThresh,1,radius_red);
 [binFrameGreenRight,greenCentroidsRight] = detectmarkerColor(frameRight,greenThresh,2,radius_green);
@@ -80,7 +76,6 @@ point3dGREEN = triangulate(centroidGreenLeft(1,:),centroidGreenRight(1,:),stereo
 %Z IN WORLD COORDINATES FOR BLUE
 point3dBLUE = triangulate(centroidBlueLeft(1,:),centroidBlueRight(1,:),stereoParams);
 
-
 %RED
 rgb = insertShape(frameLeft,'rectangle',bboxRedLeft(1,:),'Color','red',...
 'LineWidth',3);
@@ -92,7 +87,7 @@ rgb = insertShape(rgb,'rectangle',bboxBlueLeft(1,:),'Color','blue',...
 'LineWidth',3);
 
 %Convert to world coordinates
-[x_output, y_output, z_output, z_out_string] = pixel2World(centroidBlueLeft(1,1), centroidBlueLeft(1,2), point3dBLUE)
+[x_output, y_output, z_output, z_out_string] = pixel2World(centroidBlueLeft(1,1), centroidBlueLeft(1,2), point3dBLUE);
 
 rgb = insertText(rgb,centroidRedLeft(1,:) + 20,['X: ' num2str(round(centroidRedLeft(1,1)),'%d')...
 ' Y: ' num2str(round(centroidRedLeft(1,2)),'%d') ' Z: ' distanceAsStringRED],'FontSize',18);
@@ -101,7 +96,7 @@ rgb = insertText(rgb,centroidGreenLeft(1,:)+15,['X: ' num2str(round(centroidGree
 rgb = insertText(rgb,centroidBlueLeft(1,:)-75,['X: ' num2str(round(centroidBlueLeft(1,1)),'%d')...
 ' Y: ' num2str(round(centroidBlueLeft(1,2)),'%d') ' Z: ' z_out_string],'FontSize',18);
 % player(rgb);
-% pause(0.2)
+% pause(0.2)q
 % writeVideo(v,rgb);
 
 % Send to Control System
