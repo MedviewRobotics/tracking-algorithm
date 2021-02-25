@@ -1,0 +1,53 @@
+
+readerLeft = VideoReader('myVideoLeftTrial18.avi');
+readerRight = VideoReader('myVideoRightTrial 18.avi');
+
+nFramesLeft = readerLeft.NumFrames;  %Clip1.NumberOfFrames;
+vidHeightLeft = readerLeft.Height;
+vidWidthLeft = readerLeft.Width;
+
+nFramesRight = readerRight.NumFrames;  %Clip1.NumberOfFrames;
+vidHeightRight = readerRight.Height;
+vidWidthRight = readerRight.Width;
+
+%%Movie Structure
+mov(1:nFramesLeft) = ...
+    struct('readerLeft',zeros(vidHeightLeft,vidWidthLeft, 3,'uint8'),...
+           'readerRight',zeros(vidHeightRight,vidWidthRight, 3,'uint8'),...
+            'colormap',[]);
+
+for k = 1:nFramesLeft
+mov(k).readerLeft = read(readerLeft,k);
+mov(k).readerRight = read(readerRight,k);
+% figure
+% imshow(mov(k).cdata)
+% title(k)
+end
+
+img = mov(5).readerLeft;
+imshow(img)
+
+%%
+
+
+for k = 1:10:nFramesLeft
+% figure
+% imshowpair(mov(k).readerLeft,mov(k).readerRight,'montage') 
+% title(['Frame #: ' num2str(k)])
+
+frameLeft = mov(k).readerLeft 
+
+
+
+end
+
+
+
+
+
+
+
+
+
+
+
