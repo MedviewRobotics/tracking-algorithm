@@ -19,6 +19,10 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ... % Set blob analysis han
                                 'MaximumCount',3);
 %% Tracking using Grayscale thresholding
 
+% readerLeft= VideoReader('myVideoLeftTrial18.avi');
+% readerRight = VideoReader('myVideoRightTrial 18.avi');
+
+
 point3d_coord_1(235,3) = 0;
 point3d_coord_2(235,3) = 0;
 point3d_coord_3(235,3) = 0;
@@ -32,7 +36,7 @@ frameLeftGray = rgb2gray(frameLeft);
 frameRight = readFrame(readerRight);
 frameRightGray = rgb2gray(frameRight);
 
-threshold = 245;
+threshold = 240;
 
 %left
 img_left = frameLeftGray > threshold;%figure;imshow(img_cut)
@@ -46,9 +50,9 @@ BW_right = bwareafilt(img_right, 3); % Extract largest blob.
 
 %Triangulate for all three markers
 
-point3d_1 = triangulate(centroidRight(1,:),centroidLeft(1,:),stereoParams18);
-point3d_2 = triangulate(centroidRight(2,:),centroidLeft(2,:),stereoParams18);
-point3d_3 = triangulate(centroidRight(3,:),centroidLeft(3,:),stereoParams18);
+point3d_1 = triangulate(centroidLeft(1,:),centroidRight(1,:),stereoParams18);
+point3d_2 = triangulate(centroidLeft(2,:),centroidRight(2,:),stereoParams18);
+point3d_3 = triangulate(centroidLeft(3,:),centroidRight(3,:),stereoParams18);
 
 %Store marker coordinates into frame
 point3d_coord_1(count,1) = point3d_1(1,1);
