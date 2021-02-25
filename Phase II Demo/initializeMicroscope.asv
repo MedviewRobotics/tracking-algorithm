@@ -1,4 +1,4 @@
-function [AT03,q0] = initializeMicroscope(x_frame1,y_frame1,z_frame1)
+function [AT03,q0] = initializeMicroscope()
 
 % % Initialize Toolbox (Robotics Toolbox for MATLAB (release 10.4))
 % startup_rvc;
@@ -22,20 +22,17 @@ T_start = AT03.fkine(start_pos_new);
 [Start_X,Start_Y,Start_Z] = transl(T_start)
 AT03.plot(start_pos_new);
 
-%x_frame1 = -36; y_frame1= 17; z_frame1=100;
-Alt_Start_X = x_frame1 ; % -100;
-Alt_Start_Y = y_frame1; %0;
-Alt_Start_Z = z_frame1; %112;
+Alt_Start_X = -38;
+Alt_Start_Y = 2;
+Alt_Start_Z = 112;
 R = 3.1416; %new pose orientation input
 P = 0; %new pose orientation input
 Y = 0; %new pose orientation input
 T_alt_start = transl(Alt_Start_X,Alt_Start_Y,Alt_Start_Z )*rpy2tr(R,P,Y);
-q0_alt = AT03.ikine(T_alt_start);%'q0',start_pos_new);
+q0_alt = AT03.ikine(T_alt_start,'q0',start_pos_new);
 AT03.plot(q0_alt);
-
 q0 = q0_alt;
-% q0=start_pos_new;
-
+q0=start_pos_new;
 % %test
 % AT03=SerialLink(L,'name','AT03Robot');
 % %AT03.model3d = 'CAPSTONE\AT03';
