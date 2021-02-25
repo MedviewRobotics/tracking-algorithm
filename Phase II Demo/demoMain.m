@@ -7,23 +7,20 @@
 % Author #2: Mohammad Aziz Uddin - 500754765
 % Author #3: Jay Tailor - 500750496
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Initialize Peter Corke's Toolbox (Run only once)
+petercorkeinitialize();
 
 %% Initialization
-addpath(genpath('Phase 1'));
-load("stereoParams.mat")
-readerLeft= VideoReader('myVideoLeftTrial9.avi');
-readerRight= VideoReader('myVideoRightTrial9.avi');
+addpath(genpath('Trial 18-19'));
+load("stereoParams18.mat");
 
-%[stereoParams, estimationErrors] = stereoCalibrate();
+readerLeft= VideoReader('myVideoLeftTrial18.avi');
+readerRight = VideoReader('myVideoRightTrial18.avi');
 
-redThresh = 0.24; % Threshold for red detection
-greenThresh = 0.18; % Threshold for green detection
-blueThresh = 0.244; % Threshold for blue detection
-%radii for disk structural element in Image dilation (determined
-%experimentally)
-radius_red = 1;
-radius_green = 10;
-radius_blue = 1;
+player = vision.DeployableVideoPlayer('Location',[10,100]);
+% v = VideoWriter('robottrack.avi');
+% v.FrameRate = 30;
+% open(v)
 
 hblob = vision.BlobAnalysis('AreaOutputPort', false, ... % Set blob analysis handling
                                 'CentroidOutputPort', true, ... 
@@ -32,78 +29,84 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ... % Set blob analysis han
                                 'MaximumBlobArea', 20000, ...
                                 'MaximumCount',3);
 
-[Robot,q0] = initializeMicroscope();
+x_frame1 = -36; y_frame1=-80; z_frame1=30;
+[Robot,q0] = initializeMicroscope(x_frame1,y_frame1,z_frame1);
 %test
 
 %% Marker tracking and robot movement
-player = vision.DeployableVideoPlayer('Location',[10,100]);
-v = VideoWriter('xyz_all_markers.mp4');
-v.FrameRate = 30;
-open(v)
+
+%Start timer
 tic;
+
 while hasFrame(readerLeft) && hasFrame(readerRight)
 
+%Left Frame
 frameLeft = readFrame(readerLeft);
+frameLeftGray = rgb2gray(frameLeft);
+
+%Right Frame
 frameRight = readFrame(readerRight);
+frameRightGray = rgb2gray(frameRight);
 
-%Setect colored markers for each camera
-%LEFT
-[binFrameRedLeft,redCentroidsLeft] = detectmarkerColor(frameLeft,redThresh,1,radius_red);
-[binFrameGreenLeft,greenCentroidsLeft] = detectmarkerColor(frameLeft,greenThresh,2,radius_green);
-[binFrameBlueLeft,blueCentroidsLeft] = detectmarkerColor(frameLeft,blueThresh,3,radius_blue);
+%Threshold for Grayscale 
+threshold = 240;
 
-%RIGHT
-[binFrameRedRight,redCentroidsRight] = detectmarkerColor(frameRight,redThresh,1,radius_red);
-[binFrameGreenRight,greenCentroidsRight] = detectmarkerColor(frameRight,greenThresh,2,radius_green);
-[binFrameBlueRight,blueCentroidsRight] = detectmarkerColor(frameRight,blueThresh,3,radius_blue);
+%Detect markers in the Left 
+img_left = frameLeftGray > threshold;%figure;imshow(img_cut)
+BW_left = bwareafilt(img_left, 3); % Extract largest blob.
+[centroidLeft,bboxLeft] = step(hblob,BW_left);
 
-%Blob Analysis of each color
-%Left
-[centroidRedLeft,bboxRedLeft] = step(hblob,binFrameRedLeft);
-[centroidGreenLeft,bboxGreenLeft] = step(hblob,binFrameGreenLeft);
-[centroidBlueLeft,bboxBlueLeft] = step(hblob,binFrameBlueLeft);
-%Right
-[centroidRedRight,bboxRedRight] = step(hblob,binFrameRedRight);
-[centroidGreenRight,bboxGreenRight] = step(hblob,binFrameGreenRight);
-[centroidBlueRight,bboxBlueRight] = step(hblob,binFrameBlueRight);
+%Detect markers in the Right
+img_right = frameRightGray > threshold;%figure;imshow(img_cut)
+BW_right = bwareafilt(img_right, 3); % Extract largest blob.
+[centroidRight,bboxRight] = step(hblob,BW_right);
 
-%Computing 3D Coordinates
-point3dRED = triangulate(centroidRedLeft(1,:),centroidRedRight(1,:),stereoParams);
-point3dGREEN = triangulate(centroidGreenLeft(1,:),centroidGreenRight(1,:),stereoParams);
-point3dBLUE = triangulate(centroidBlueLeft(1,:),centroidBlueRight(1,:),stereoParams);
+%Triangulate for all three markers
 
+point3d_1 = triangulate(centroidLeft(1,:),centroidRight(1,:),stereoParams18);
+point3d_2 = triangulate(centroidLeft(2,:),centroidRight(2,:),stereoParams18);
+point3d_3 = triangulate(centroidLeft(3,:),centroidRight(3,:),stereoParams18);
 
-%RED
+% Insert shape on markers
+rgb = insertShape(frameLeft,'rectangle',bboxLeft(1,:),'Color','black',...
+'LineWidth',3);
+%GREEN
+rgb = insertShape(rgb,'rectangle',bboxLeft(2,:),'Color','black',...
+'LineWidth',3);
+%BLUE
+rgb = insertShape(rgb,'rectangle',bboxLeft(3,:),'Color','black',...
+'LineWidth',3);
 
-rgb = insertShape(frameLeft,'rectangle',bboxRedLeft(1,:),'Color','red',...
-'LineWidth',3);%Red
-rgb = insertShape(rgb,'rectangle',bboxGreenLeft(1,:),'Color','green',...
-'LineWidth',3);%Green
-rgb = insertShape(rgb,'rectangle',bboxBlueLeft(1,:),'Color','blue',...
-'LineWidth',3);%Blue
+rgb = insertText(rgb,centroidLeft(1,:) - 20,['X: ' num2str(round(point3d_1(1,1)),'%d')...
+' Y: ' num2str(round(point3d_1(1,2)),'%d') ' Z: ' num2str(round(point3d_1(1,3)))],'FontSize',18);
 
-%Plotting output in world coordinates
-rgb = insertText(rgb,centroidRedLeft(1,:) + 20,['X: ' num2str(round(point3dRED(1)),'%d')...
-' Y: ' num2str(round(point3dRED(2)),'%d') ' Z: ' num2str(round(point3dRED(3)))],'FontSize',18);
-rgb = insertText(rgb,centroidGreenLeft(1,:)+15,['X: ' num2str(round(point3dGREEN(1)),'%d')...
-' Y: ' num2str(round(point3dGREEN(2)),'%d') ' Z: ' num2str(round(point3dGREEN(3)))] ,'FontSize',18);
-rgb = insertText(rgb,centroidBlueLeft(1,:)-75,['X: ' num2str(round(point3dBLUE(1)),'%d')...
-' Y: ' num2str(round(point3dBLUE(2)),'%d') ' Z: ' num2str(round(point3dBLUE(3)))],'FontSize',18);
+rgb = insertText(rgb,centroidLeft(2,:) + 50,['X: ' num2str(round(point3d_2(1,1)),'%d')...
+' Y: ' num2str(round(point3d_2(1,2)),'%d') ' Z: ' num2str(round(point3d_2(1,3)))],'FontSize',18);
+
+rgb = insertText(rgb,centroidLeft(3,:) - 50,['X: ' num2str(round(point3d_3(1,1)),'%d')...
+' Y: ' num2str(round(point3d_3(1,2)),'%d') ' Z: ' num2str(round(point3d_3(1,3)))],'FontSize',18);
 
 player(rgb);
-pause(0.2)
-writeVideo(v,rgb);
+writeVideo(v,rgb);    
 
+%count = count + 1;  
 % World to Microscope Coordinate Mapping (for blue coordinates)
-[xMicroscope, yMicroscope, zMicroscope] = world2Microscope(point3dBLUE(1), point3dBLUE(2), point3dBLUE(3))
+[xMicroscope, yMicroscope, zMicroscope] = world2Microscope(point3d_1(1), point3d_1(2), point3d_1(3))
+
+% Send to Control System
+% q0 = moveMicroscope(-36, 0, 113, q0, Robot);
+q0 = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
+%q0 = moveMicroscope(-36, yMicroscope, 104, q0, Robot);
+ 
+end
+
+% release(player)
+% close(v);  
 
 
 % Send to Control System
-q0 = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
+% q0 = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
 
-end
+%Stop timer
 toc;
-
-% release(player)
-% close(v);
 

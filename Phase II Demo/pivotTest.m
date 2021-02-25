@@ -210,13 +210,19 @@ point3d_coord(235,3) = 0;
 count = 1;
 
 while hasFrame(readerLeft) && hasFrame(readerRight)
+
     
+%Pre-processing
 frameLeft = readFrame(readerLeft);
 frameLeftGray = rgb2gray(frameLeft);
 
 frameRight = readFrame(readerRight);
 frameRightGray = rgb2gray(frameRight);
 
+
+
+
+%Threshold to detect markers
 threshold = 240;
 
 %right
@@ -228,6 +234,10 @@ BW_right = bwareafilt(img_right, 3); % Extract largest blob.
 img_left = frameLeftGray > threshold;%figure;imshow(img_cut)
 BW_left = bwareafilt(img_left, 3); % Extract largest blob.
 [centroidLeft,bboxLeft] = step(hblob,BW_left);
+
+
+
+
 
 %Triangulate for all three markers
 
