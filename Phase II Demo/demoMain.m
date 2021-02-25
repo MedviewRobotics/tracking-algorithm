@@ -7,18 +7,20 @@
 % Author #2: Mohammad Aziz Uddin - 500754765
 % Author #3: Jay Tailor - 500750496
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Initialize Peter Corke's Toolbox (Run only once)
+petercorkeinitialize();
 
 %% Initialization
 addpath(genpath('Trial 18-19'));
-load("stereoParams18.mat")
+load("stereoParams18.mat");
 
 readerLeft= VideoReader('myVideoLeftTrial18.avi');
 readerRight = VideoReader('myVideoRightTrial18.avi');
 
 player = vision.DeployableVideoPlayer('Location',[10,100]);
-v = VideoWriter('robottrack.avi');
-v.FrameRate = 30;
-open(v)
+% v = VideoWriter('robottrack.avi');
+% v.FrameRate = 30;
+% open(v)
 
 hblob = vision.BlobAnalysis('AreaOutputPort', false, ... % Set blob analysis handling
                                 'CentroidOutputPort', true, ... 
@@ -27,7 +29,8 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ... % Set blob analysis han
                                 'MaximumBlobArea', 20000, ...
                                 'MaximumCount',3);
 
-[Robot,q0] = initializeMicroscope();
+x_frame1 = -36; y_frame1=-80; z_frame1=30;
+[Robot,q0] = initializeMicroscope(x_frame1,y_frame1,z_frame1);
 %test
 
 %% Marker tracking and robot movement
@@ -60,9 +63,9 @@ BW_right = bwareafilt(img_right, 3); % Extract largest blob.
 
 %Triangulate for all three markers
 
-point3d_1 = triangulate(centroidRight(1,:),centroidLeft(1,:),stereoParams18);
-point3d_2 = triangulate(centroidRight(2,:),centroidLeft(2,:),stereoParams18);
-point3d_3 = triangulate(centroidRight(3,:),centroidLeft(3,:),stereoParams18);
+point3d_1 = triangulate(centroidLeft(1,:),centroidRight(1,:),stereoParams18);
+point3d_2 = triangulate(centroidLeft(2,:),centroidRight(2,:),stereoParams18);
+point3d_3 = triangulate(centroidLeft(3,:),centroidRight(3,:),stereoParams18);
 
 % Insert shape on markers
 rgb = insertShape(frameLeft,'rectangle',bboxLeft(1,:),'Color','black',...
@@ -86,18 +89,23 @@ rgb = insertText(rgb,centroidLeft(3,:) - 50,['X: ' num2str(round(point3d_3(1,1))
 player(rgb);
 writeVideo(v,rgb);    
 
-count = count + 1;  
-    
-end
-
-release(player)
-close(v);  
-
+%count = count + 1;  
 % World to Microscope Coordinate Mapping (for blue coordinates)
-[xMicroscope, yMicroscope, zMicroscope] = world2Microscope(point3d_1(1), point3d_1(2), point3d_1(3));
+[xMicroscope, yMicroscope, zMicroscope] = world2Microscope(point3d_1(1), point3d_1(2), point3d_1(3))
 
 % Send to Control System
+% q0 = moveMicroscope(-36, 0, 113, q0, Robot);
 q0 = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
+%q0 = moveMicroscope(-36, yMicroscope, 104, q0, Robot);
+ 
+end
+
+% release(player)
+% close(v);  
+
+
+% Send to Control System
+% q0 = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
 
 %Stop timer
 toc;
