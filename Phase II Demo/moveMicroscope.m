@@ -15,7 +15,7 @@ q0;
 qf = AT03.ikine(T_start,'q0',q0);
 
 %move to new pose
-[Q,QD,QDD] = jtraj(q0, qf, 15);
+[Q,QD,QDD] = jtraj(q0, qf, 10);
 AT03.plot(Q);
 
 %New pose is now the old/start pose
