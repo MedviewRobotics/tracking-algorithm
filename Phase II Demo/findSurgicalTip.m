@@ -13,4 +13,3 @@ m2r_norm = m2r/norm(m2r);
 surgicalTip_3D = midpoint + m2r_norm*pivotOffset;
 
 end
-
