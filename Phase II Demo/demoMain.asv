@@ -125,7 +125,7 @@ end
 
 %Stop timer
 toc;
-%% DONE
+%% NOT DONE
 %X for Jay %NO SHIFT! 
 %If Z in Ginette increases ... Robot should move BACK (-x / into itself)
 z_min = min(z_world_test) %1029 %TRY 70
@@ -133,6 +133,7 @@ z_max = max(z_world_test) %1762 %TRY 20
 
 %When ginette moves deepr in video (Depth/Z_word INCREASES) ... X value decreases in Robot
 
+%% DONE
 % Y in Jay
 %cross section of image is ZERO
 x_min = min(x_world_test) %-410 %TRY -50  
