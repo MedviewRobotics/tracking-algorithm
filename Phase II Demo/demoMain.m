@@ -31,7 +31,7 @@ vidWidthRight = readerRight.Width;
 mov(1:nFramesLeft) = ...
     struct('readerLeft',zeros(vidHeightLeft,vidWidthLeft, 3,'uint8'),...
            'readerRight',zeros(vidHeightRight,vidWidthRight, 3,'uint8'),...
-            'colormap',[]);
+           'colormap',[]);
 
 for k = 1:nFramesLeft
 mov(k).readerLeft = read(readerLeft,k);
@@ -85,7 +85,7 @@ point3d_2 = triangulate(centroidLeft(2,:),centroidRight(2,:),stereoParams18);
 point3d_3 = triangulate(centroidLeft(3,:),centroidRight(3,:),stereoParams18);
 
 %Find surgical tip location
-surgicalTip = findSurgicalTip(point3d_1,point3d_2, point3d_3, pivotOffset);
+surgicalTip = findSurgicalTip(point3d_1,point3d_2,point3d_3, pivotOffset);
 
 % Insert shape on markers
 rgb = insertShape(frameLeft,'rectangle',bboxLeft(1,:),'Color','black',...
