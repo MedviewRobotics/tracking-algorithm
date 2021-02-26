@@ -198,6 +198,8 @@ g2b = point3d_2 - point3d_1;
 g2b_norm = g2b/norm(g2b);
 midpoint = point3d_1 + g2b_norm*37.5;
 
+%Find 2D surgical tip
+surgicalTip = findSurgicalTip(centroidLeft(1,:),centroidLeft(2,:), centroidLeft(3,:), pivotOffset);
 
 % Insert shape on markers
 rgb = insertShape(frameLeft,'rectangle',bboxLeft(1,:),'Color','black',...
@@ -222,7 +224,13 @@ player(rgb);
 
 end
 
-surgicalTip = findSurgicalTip(point3d_1,point3d_2, point3d_3, pivotOffset)
+
+imshow(frameLeft)
+
+surgicalTip = findSurgicalTip(point3d_1,point3d_3, point3d_2, pivotOffset)
+
+%validation
+surgicalTip_validate = triangulate([505, 442],[582, 446],stereoParams18)
 
 figure
 plot3((point3d_3(1,1)), (point3d_3(1,2)), (point3d_3(1,3)), 'ro');
