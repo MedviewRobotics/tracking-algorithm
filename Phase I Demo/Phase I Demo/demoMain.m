@@ -10,60 +10,48 @@
 %% Local Directory
 addpath(genpath('Phase 1'));
 
-%% Play short clip of the left input video 
-winopen('myVideoLeftTrial9.avi')
-
-%% Play short clip of the right input video 
-winopen('myVideoRightTrial9.avi')
-
-%% Show example left image for calibration
-winopen('left_13.jpg')
-
-%% Show example right image for calibration
-winopen('right_13.jpg')
-
 %% Import videos to workspace
-readerLeft= VideoReader('myVideoLeftTrial9.avi');
-readerRight= VideoReader('myVideoRightTrial9.avi');
+readerLeft= VideoReader('myLeftTrialHoriz5cm.avi');
+readerRight= VideoReader('myRightTrialHoriz5cm.avi');
 
 %% Calculate camera parameters using calibration image pairs 
 %Call stereoCalibrate Function
-[stereoParams, estimationErrors] = stereoCalibrate();
+%[stereoParams, estimationErrors] = stereoCalibrate();
 
 %% Demonstrate rectification
-% Grab a frame pair to plot a demonstration
-leftFrame = read(readerLeft, 175);
-rightFrame = read(readerRight, 175);
-
-%Rectify Images
-[R1 R2] = rectifyStereoImages(leftFrame, rightFrame, stereoParams);
-
-%Plot images before and after rectification in one subplot
-figure
-subplot(2, 2, 1)
-imshow(leftFrame)
-title('Left Frame #175 Before Rectification');
-subplot(2, 2, 2)
-imshow(rightFrame)
-title('Right Frame #175 Before Rectification');
-%figure
-subplot(2, 2, 3)
-imshow(R1)
-title('Left Frame #175 After Rectification');
-subplot(2, 2, 4)
-imshow(R2)
-title('Right Frame #175 After Rectification');
-
-%Create the stereo anaglyph of the rectified stereo pair image and display it
-A = stereoAnaglyph(R1,R2);
-figure;
-imshow(A);
-title('Anaglyph Composite View of the Rectified Stereo Pair Image');
+% % Grab a frame pair to plot a demonstration
+% leftFrame = read(readerLeft, 175);
+% rightFrame = read(readerRight, 175);
+% 
+% %Rectify Images
+% [R1 R2] = rectifyStereoImages(leftFrame, rightFrame, stereoParams);
+% 
+% %Plot images before and after rectification in one subplot
+% figure
+% subplot(2, 2, 1)
+% imshow(leftFrame)
+% title('Left Frame #175 Before Rectification');
+% subplot(2, 2, 2)
+% imshow(rightFrame)
+% title('Right Frame #175 Before Rectification');
+% %figure
+% subplot(2, 2, 3)
+% imshow(R1)
+% title('Left Frame #175 After Rectification');
+% subplot(2, 2, 4)
+% imshow(R2)
+% title('Right Frame #175 After Rectification');
+% 
+% %Create the stereo anaglyph of the rectified stereo pair image and display it
+% A = stereoAnaglyph(R1,R2);
+% figure;
+% imshow(A);
+% title('Anaglyph Composite View of the Rectified Stereo Pair Image');
 %% Tracker detection demonstration:
 
 % To play tracking video
 player = vision.DeployableVideoPlayer('Location',[10,100]);
-v = VideoWriter('OTS_Demo1.mp4');
+%v = VideoWriter('OTS_Demo1.mp4');
 open(v)
 % Thresholds determined experimentally and through colorThresholder App
 redThresh = 0.208; % Threshold for red detection
