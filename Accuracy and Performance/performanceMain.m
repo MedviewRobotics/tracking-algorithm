@@ -50,7 +50,6 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ...
                                 'MaximumBlobArea', 20000, ...
                                 'MaximumCount',3);
 
-
 [Robot,q0] = initializeMicroscope();
 disp('Initialization Completed.');
 
