@@ -11,6 +11,7 @@
 petercorkeinitialize();
 
 %% Initialize Tracking System Parameters
+close all;
 addpath(genpath('Trial 18-19'));
 load("stereoParams18.mat");
 
