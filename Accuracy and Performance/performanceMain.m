@@ -143,23 +143,21 @@ Avg_Time = zeros(5, 1);
 Stdv_Time = zeros(5, 1);
 Max_Time = zeros(5, 1);
 Min_Time = zeros(5, 1);
-Equiv_FPS_Rate = zeros(5, 1);
 
 for i = 1:4
     array = strcat('elapsed_', num2str(i));
     Avg_Time(i+1, 1) = mean(eval(array));
-    Equiv_FPS_Rate(i+1, 1) = 1/(Avg_Time(i+1, 1));
     Stdv_Time(i+1, 1) = std(eval(array));
     Max_Time(i+1, 1) = max(eval(array));
     Min_Time(i+1, 1) = min(eval(array));
 end
 
 Avg_Time(1, 1) = sum(Avg_Time(2:5,:));
-Equiv_FPS_Rate(1, 1) = 1/(Avg_Time(1, 1));
+Equiv_FPS_Rate = 1/(Avg_Time(1, 1));
 Stdv_Time(1, 1) = sqrt(sum((Stdv_Time(2:5,:)).^2));
 Max_Time(1, 1) = sum(Max_Time(2:5,:));
 Min_Time(1, 1) = sum(Min_Time(2:5,:));
 
-T = table(Process_Names, Avg_Time, Equiv_FPS_Rate, Stdv_Time, Max_Time, Min_Time)
+T = table(Process_Names, Avg_Time, Stdv_Time, Max_Time, Min_Time)
 
-
+fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
