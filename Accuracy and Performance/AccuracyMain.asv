@@ -21,8 +21,8 @@ load("stereoParamsAccuracy.mat");
 pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
 threshold = 250; % Threshold for Grayscale 
 
-readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
-readerRight = VideoReader('myRightTrialHoriz5cm.avi');
+readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
+readerRight = VideoReader('myRightTrialHoriz10cm.avi');
 
 %Set up for skipping n frames
 nFramesLeft = readerLeft.NumFrames;
@@ -56,7 +56,6 @@ disp('Initialization Completed.');
 elapsed_initialized = toc; %Assign toc to initialization time
 
 %% Marker tracking and robot movement
-point3d_1_Accuracy(:,3) = zeros();
 
 %Initialize Arrays
 elapsed_1 = zeros(1, 235);
@@ -97,14 +96,13 @@ BW_right = bwareafilt(img_right, 3); %Extract 3 largest blobs
 [centroidRight,bboxRight] = step(hblob,BW_right);
 
 %Triangulate for all three markers. R,G,B
+point3d_1_Accuracy(:,3) = zeros();
 point3d_1_Accuracy(k,:) = triangulate(centroidLeft(1,:),centroidRight(1,:),stereoParams);
 point3d_1 = triangulate(centroidLeft(1,:),centroidRight(1,:),stereoParams);
 point3d_2 = triangulate(centroidLeft(2,:),centroidRight(2,:),stereoParams);
-point3d_2_Accuracy(k,:) = triangulate(centroidLeft(2,:),centroidRight(2,:),stereoParams);
 point3d_3 = triangulate(centroidLeft(3,:),centroidRight(3,:),stereoParams);
 
 %Find surgical tip location
-surgicalTip_Accuracy(k,:) = findSurgicalTip(point3d_1,point3d_2,point3d_3, pivotOffset);
 surgicalTip = findSurgicalTip(point3d_1,point3d_2,point3d_3, pivotOffset);
 
 elapsed_2(k) = toc; %end find tip timer
@@ -144,10 +142,34 @@ close(v);
 %% Output Accuracy Metrics
 
 %Set Test Ground Truths - Original Video Displacement
-Hor_disp = 50; %5cm
+Hor_disp = 100; %10cm
 
 %Video - Red Marker
-B = point3d_1_Accuracy(:,1); %Temp
+B = point3d_1_Accuracy(:,2); %Temp
 B(B == 0) = NaN; %Setting Skipped Frames 0 Output value to NaN
 point3d_1_Accuracy_Hor = max(B) - min(B) %How much tracker Moved
 Horizontal_Accuracy = 100 - abs((point3d_1_Accuracy_Hor-Hor_disp)./Hor_disp)*100 %Error Percentage
+%% Output performance metrics
+% 
+% Process_Names = ["Entire Worflow"; "Preprocessing";"Find Tip"; "World2Microscope"; "Control System"];
+% Average_Elapsed_Time = zeros(5, 1);
+% Stdv_Elapsed_Time = zeros(5, 1);
+% Max_Elapsed_Time = zeros(5, 1);
+% Min_Elapsed_Time = zeros(5, 1);
+% 
+% for i = 1:4
+%     array = strcat('elapsed_', num2str(i));
+%     Average_Elapsed_Time(i+1, 1) = mean(eval(array));
+%     Stdv_Elapsed_Time(i+1, 1) = std(eval(array));
+%     Max_Elapsed_Time(i+1, 1) = max(eval(array));
+%     Min_Elapsed_Time(i+1, 1) = min(eval(array));
+% end
+% 
+% Average_Elapsed_Time(1, 1) = sum(Average_Elapsed_Time(2:5,:));
+% Stdv_Elapsed_Time(1, 1) = sqrt(sum((Stdv_Elapsed_Time(2:5,:)).^2));
+% Max_Elapsed_Time(1, 1) = sum(Max_Elapsed_Time(2:5,:));
+% Min_Elapsed_Time(1, 1) = sum(Min_Elapsed_Time(2:5,:));
+% 
+% T = table(Process_Names, Average_Elapsed_Time, Stdv_Elapsed_Time, Max_Elapsed_Time, Min_Elapsed_Time)
+% 
+% 
