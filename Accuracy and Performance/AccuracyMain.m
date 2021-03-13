@@ -21,8 +21,8 @@ load("stereoParamsAccuracy.mat");
 pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
 threshold = 250; % Threshold for Grayscale 
 
-readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
-readerRight = VideoReader('myRightTrialHoriz5cm.avi');
+readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
+readerRight = VideoReader('myRightTrialHoriz10cm.avi');
 
 %Set up for skipping n frames
 nFramesLeft = readerLeft.NumFrames;
@@ -70,7 +70,7 @@ v = VideoWriter('pivot.avi');
 v.FrameRate = 30;
 open(v)
 
-frames_skip = 5;
+frames_skip = 10;
 
 for k = 1:frames_skip:nFramesLeft
 tic %Starts pre-processing timer
@@ -100,7 +100,6 @@ BW_right = bwareafilt(img_right, 3); %Extract 3 largest blobs
 point3d_1_Accuracy(k,:) = triangulate(centroidLeft(1,:),centroidRight(1,:),stereoParams);
 point3d_1 = triangulate(centroidLeft(1,:),centroidRight(1,:),stereoParams);
 point3d_2 = triangulate(centroidLeft(2,:),centroidRight(2,:),stereoParams);
-point3d_2_Accuracy(k,:) = triangulate(centroidLeft(2,:),centroidRight(2,:),stereoParams);
 point3d_3 = triangulate(centroidLeft(3,:),centroidRight(3,:),stereoParams);
 
 %Find surgical tip location
@@ -143,11 +142,6 @@ close(v);
 
 %% Output Accuracy Metrics
 
-%Set Test Ground Truths - Original Video Displacement
-Hor_disp = 50; %5cm
+[Tracked_Displacement,Accuracy] = trackingAccuracy(point3d_1_Accuracy(:,1),100);
 
-%Video - Red Marker
-B = point3d_1_Accuracy(:,1); %Temp
-B(B == 0) = NaN; %Setting Skipped Frames 0 Output value to NaN
-point3d_1_Accuracy_Hor = max(B) - min(B) %How much tracker Moved
-Horizontal_Accuracy = 100 - abs((point3d_1_Accuracy_Hor-Hor_disp)./Hor_disp)*100 %Error Percentage
+T = table(Tracked_Displacement, Accuracy)
