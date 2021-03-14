@@ -7,7 +7,8 @@ lclCoord = global2localcoord([x_input;y_input;z_input],'rr',[x_world_to_local;..
     y_world_to_local; z_world_to_local]);
 
 %%
-y_output = -0.1389*lclCoord(1); %Z from Tracking
+%y_output = -0.1389*lclCoord(1); %Z from Tracking
+y_output = lclCoord(1); %Z from Tracking
 
 %%
 x_output_temp = -0.233*lclCoord(3); %X from Tracking
@@ -20,7 +21,8 @@ else
 end
 
 %%
-z_output = 0.075*lclCoord(2); %Y from Trakcing
+%z_output = 0.075*lclCoord(2); %Y from Trakcing
+z_output = lclCoord(2); %Y from Trakcing
 
 end
 
