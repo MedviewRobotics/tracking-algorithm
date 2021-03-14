@@ -156,3 +156,16 @@ title('World2Microscope')
 subplot(4, 1, 4)
 plot(elapsed_4)
 title('Control System')
+
+%% [Delete Later] Plotting Surgical Tip plane
+[surgicalTip, normal, planefunction, zplane] = findSurgicalTip(point3d_1,point3d_2,point3d_3, pivotOffset);
+
+figure
+fmesh(zplane)
+hold on
+plot3((point3d_3(1,1)), (point3d_3(1,2)), (point3d_3(1,3)), 'ro');
+plot3((point3d_2(1,1)), (point3d_2(1,2)), (point3d_2(1,3)), 'bo');
+plot3((point3d_1(1,1)), (point3d_1(1,2)), (point3d_1(1,3)), 'go');
+plot3((surgicalTip(1,1)), (surgicalTip(1,2)), (surgicalTip(1,3)), 'mo');
+hold off
+
