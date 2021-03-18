@@ -57,6 +57,7 @@ elapsed_initialized = toc; %Assign toc to initialization time
 
 %% Marker tracking and robot movement
 close all;
+clear point3d_1_Accuracy;
 point3d_1_Accuracy(:,3) = zeros();
 
 %Initialize Arrays
@@ -71,7 +72,7 @@ v = VideoWriter('pivot.avi');
 v.FrameRate = 30;
 open(v)
 
-frames_skip = 1;
+frames_skip = 5;
 
 
 for k = 1:frames_skip:nFramesLeft
@@ -147,5 +148,6 @@ close(v);
 
 %% Output Accuracy Metrics
 
-[Tracked_Displacement,Accuracy] = trackingAccuracy(point3d_1_Accuracy(:,1),100);
+[Tracked_Displacement,Accuracy] = trackingAccuracy(point3d_1_Accuracy(:,1),50);
 T = table(Tracked_Displacement, Accuracy);
+disp(T);
