@@ -56,6 +56,7 @@ disp('Initialization Completed.');
 elapsed_initialized = toc; %Assign toc to initialization time
 
 %% Marker tracking and robot movement
+close all;
 point3d_1_Accuracy(:,3) = zeros();
 
 %Initialize Arrays
@@ -71,6 +72,7 @@ v.FrameRate = 30;
 open(v)
 
 frames_skip = 1;
+
 
 for k = 1:frames_skip:nFramesLeft
 tic %Starts pre-processing timer
@@ -125,12 +127,15 @@ rgb = insertText(rgb,centroidLeft(3,:) - 50,['X: ' num2str(round(point3d_3(1,1))
 
 player(rgb);
 
+
 tic; %start world2microscope timer
-% [xMicroscope, yMicroscope, zMicroscope] = world2Microscope(surgicalTip(1), surgicalTip(2), surgicalTip(3)); %World to Microscope Coordinate Mapping
+[xMicroscope, yMicroscope, zMicroscope] = world2Microscope(surgicalTip(1), surgicalTip(2), surgicalTip(3)); %World to Microscope Coordinate Mapping
 elapsed_3(k) = toc;
 
+[xMicroscope, yMicroscope, zMicroscope] = safetyprotocols(xMicroscope, yMicroscope, zMicroscope); %Implementation of Safety Protocols
+
 tic; %start control system timer
-% q0 = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot); %Send Coordinates to AT03 Robot
+q0 = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot); %Send Coordinates to AT03 Robot
 elapsed_4(k) = toc;
 
 player(rgb);
@@ -143,5 +148,4 @@ close(v);
 %% Output Accuracy Metrics
 
 [Tracked_Displacement,Accuracy] = trackingAccuracy(point3d_1_Accuracy(:,1),100);
-
-T = table(Tracked_Displacement, Accuracy)
+T = table(Tracked_Displacement, Accuracy);
