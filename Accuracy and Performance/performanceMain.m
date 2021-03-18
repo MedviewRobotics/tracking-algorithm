@@ -99,7 +99,7 @@ point3d_2 = triangulate(centroidLeft(2,:),centroidRight(2,:),stereoParams18);
 point3d_3 = triangulate(centroidLeft(3,:),centroidRight(3,:),stereoParams18);
 
 %Find surgical tip location
-surgicalTip = findSurgicalTip(point3d_1,point3d_2,point3d_3, pivotOffset);
+[surgicalTip, rotMatrix] = findSurgicalTip(point3d_1,point3d_2,point3d_3, pivotOffset);
 
 elapsed_2(k) = toc; %end find tip timer
 
@@ -141,31 +141,3 @@ close(v);
 
 disp(T);
 fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
-
-%% [Delete Later] Plot the elapsed times
-figure
-subplot(4, 1, 1)
-plot(elapsed_1)
-title('Preprocessing')
-subplot(4, 1, 2)
-plot(elapsed_2)
-title('Find Tip')
-subplot(4, 1, 3)
-plot(elapsed_3)
-title('World2Microscope')
-subplot(4, 1, 4)
-plot(elapsed_4)
-title('Control System')
-
-%% [Delete Later] Plotting Surgical Tip plane
-[surgicalTip, normal, planefunction, zplane] = findSurgicalTip(point3d_1,point3d_2,point3d_3, pivotOffset);
-
-figure
-fmesh(zplane)
-hold on
-plot3((point3d_3(1,1)), (point3d_3(1,2)), (point3d_3(1,3)), 'ro');
-plot3((point3d_2(1,1)), (point3d_2(1,2)), (point3d_2(1,3)), 'bo');
-plot3((point3d_1(1,1)), (point3d_1(1,2)), (point3d_1(1,3)), 'go');
-plot3((surgicalTip(1,1)), (surgicalTip(1,2)), (surgicalTip(1,3)), 'mo');
-hold off
-
