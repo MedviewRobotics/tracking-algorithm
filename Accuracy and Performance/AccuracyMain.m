@@ -71,7 +71,7 @@ v = VideoWriter('pivot.avi');
 v.FrameRate = 30;
 open(v)
 
-frames_skip = 1;
+frames_skip = 5;
 
 for k = 1:frames_skip:nFramesLeft
 tic %Starts pre-processing timer
