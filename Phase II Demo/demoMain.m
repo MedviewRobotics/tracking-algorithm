@@ -52,15 +52,20 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ...
 disp('Initialization Completed.');
 
 %% Marker tracking and robot movement
-
+close all;
 tic; %Start timer
+count = 1;
+x_world_test = 0;
+y_world_test = 0;
+z_world_test = 0;
+tester = 0;
 
 player = vision.DeployableVideoPlayer('Location',[10,100]);
 v = VideoWriter('pivot.avi');
 v.FrameRate = 30;
 open(v)
 
-for k = 1:10:nFramesLeft
+for k = 1:1:nFramesLeft
 
 %Read Frames
 frameLeft = mov(k).readerLeft ;
@@ -107,6 +112,11 @@ player(rgb);
   
 % World to Microscope Coordinate Mapping
 [xMicroscope, yMicroscope, zMicroscope] = world2Microscope(surgicalTip(1), surgicalTip(2), surgicalTip(3));
+
+count = count + 1;
+x_world_test(count) = xMicroscope;
+y_world_test(count) = yMicroscope;
+z_world_test(count) = zMicroscope;
 
 % Send Coordinates to AT03 Robot
 q0 = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
