@@ -21,8 +21,8 @@ load("stereoParamsAccuracy.mat");
 pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
 threshold = 250; % Threshold for Grayscale 
 
-readerLeft = VideoReader('myLeftTrialNormalMovement.avi');
-readerRight = VideoReader('myRightTrialNormalMovement.avi');
+readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
+readerRight = VideoReader('myRightTrialHoriz5cm.avi');
 
 %Set up for skipping n frames
 nFramesLeft = readerLeft.NumFrames;
@@ -71,7 +71,8 @@ v = VideoWriter('pivot.avi');
 v.FrameRate = 30;
 open(v)
 
-frames_skip = 5;
+frames_skip = 1;
+
 
 for k = 1:frames_skip:nFramesLeft
 tic %Starts pre-processing timer
@@ -104,8 +105,8 @@ point3d_2 = triangulate(centroidLeft(2,:),centroidRight(2,:),stereoParams);
 point3d_3 = triangulate(centroidLeft(3,:),centroidRight(3,:),stereoParams);
 
 %Find surgical tip location
-surgicalTip_Accuracy(k,:) = findSurgicalTip(point3d_1,point3d_2,point3d_3, pivotOffset);
-surgicalTip = findSurgicalTip(point3d_1,point3d_2,point3d_3, pivotOffset);
+[surgicalTip_Accuracy(k,:), rotMatrix] = findSurgicalTip(point3d_1,point3d_2,point3d_3, pivotOffset);
+[surgicalTip, rotMatrix] = findSurgicalTip(point3d_1,point3d_2,point3d_3, pivotOffset);
 
 elapsed_2(k) = toc; %end find tip timer
 
