@@ -6,10 +6,10 @@ function [AT03,q0] = initializeMicroscope()
 % installedToolbox = matlab.addons.toolbox.installToolbox(toolboxFile);
 
 % Initialize Robot SerialLink
-L(1)=Link ([0 0 0 pi/2]);
-L(2)=Link ([0 0 118.7 0]);
+L(1)=Link ([0 28 0 pi/2]);
+L(2)=Link ([0 0 126.5 0]);
 L(3)=Link ([0 0 0 pi/2]);
-L(4)=Link ([0 36 0 -pi/2]);
+L(4)=Link ([0 93.95 0 -pi/2]);
 L(5)=Link ([0 0 0 pi/2]);
 L(6)=Link ([0 5.5 0 0]);
 
