@@ -71,7 +71,19 @@ v = VideoWriter('pivot.avi');
 v.FrameRate = 30;
 open(v)
 
-frames_skip = 5;
+count = 1;
+x_world_test_new = 0;
+y_world_test_new = 0;
+z_world_test_new = 0;
+x_world_test_micro = 0;
+y_world_test_micro = 0;
+z_world_test_micro = 0;
+x_world_test_micro_2 = 0;
+y_world_test_micro_2 = 0;
+z_world_test_micro_2 = 0;
+tester = 0;
+
+frames_skip = 1;
 
 for k = 1:frames_skip:nFramesLeft
 tic %Starts pre-processing timer
@@ -126,12 +138,24 @@ rgb = insertText(rgb,centroidLeft(3,:) - 50,['X: ' num2str(round(point3d_3(1,1))
 
 player(rgb);
 
+count = count + 1;
+x_world_test_new(count) = surgicalTip(1);
+y_world_test_new(count) = surgicalTip(2);
+z_world_test_new(count) = surgicalTip(3);
 
 tic; %start world2microscope timer
 [xMicroscope, yMicroscope, zMicroscope] = world2Microscope(surgicalTip(1), surgicalTip(2), surgicalTip(3)); %World to Microscope Coordinate Mapping
 elapsed_3(k) = toc;
 
+x_world_test_micro(count) = xMicroscope;
+y_world_test_micro(count) = yMicroscope;
+z_world_test_micro(count) = zMicroscope;
+
 [xMicroscope, yMicroscope, zMicroscope] = safetyprotocols(xMicroscope, yMicroscope, zMicroscope); %Implementation of Safety Protocols
+
+x_world_test_micro_2(count) = xMicroscope;
+y_world_test_micro_2(count) = yMicroscope;
+z_world_test_micro_2(count) = zMicroscope;
 
 tic; %start control system timer
 q0 = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot); %Send Coordinates to AT03 Robot
@@ -143,6 +167,63 @@ end
 
 release(player)
 close(v);  
+
+figure;
+subplot(311)
+plot(y_world_test_new);
+title ('Surgical Tip Local Coordinates - "Y" from Tracking')
+subplot(312)
+plot(z_world_test_micro);
+title ('Surgical Tip World Coordinates - "Z" for Ctrl Sys')
+subplot(313)
+plot(z_world_test_micro_2);
+title ('Surgical Tip World Coordinates with Saftety Bounds - "Z" for Ctrl Sys')
+xlabel('Frame #');
+
+figure;
+subplot(311)
+plot(x_world_test_new);
+title ('Surgical Tip Local Coordinates - "X" from Tracking')
+subplot(312)
+plot(y_world_test_micro);
+title ('Surgical Tip World Coordinates - "Y" for Ctrl Sys')
+subplot(313)
+plot(y_world_test_micro_2);
+title ('Surgical Tip World Coordinates with Saftety Bounds - "Y" for Ctrl Sys')
+xlabel('Frame #');
+
+figure;
+subplot(311)
+plot(z_world_test_new);
+title ('Surgical Tip Local Coordinates - "Z" from Tracking')
+subplot(312)
+plot(x_world_test_micro);
+title ('Surgical Tip World Coordinates - "X for Ctrl Sys')
+subplot(313)
+plot(x_world_test_micro_2);
+title ('Surgical Tip World Coordinates with Saftety Bounds - "X" for Ctrl Sys')
+xlabel('Frame #');
+
+%% NOT DONE
+% %X for Jay %NO SHIFT! 
+% %If Z in Ginette increases ... Robot should move BACK (-x / into itself)
+% z_min = min(z_world_test_new); %1328.8 Outlier:0 %TRY 70
+% z_max = max(z_world_test_new); %1789 %TRY 20
+% 
+% %When ginette moves deepr in video (Depth/Z_word INCREASES) ... X value decreases in Robot
+% 
+% % Y in Jay
+% %cross section of image is ZERO
+% x_min = min(x_world_test_new); %-224 ... Outlier: -378 %TRY -40  
+% x_max = max(x_world_test_new); %-92.97 ... Outlier: 0  %TRY 40
+% 
+% % Ginette Y value goes UP as she moves DOWN in video
+% % robot should move DOWN when Ginette moves DOWN
+% % MEANS Robot z value decrease when ginette Y value increase
+% % cross section of image is ZERO
+% y_min = min(y_world_test_new); %-104                       %TRY 130
+% y_max = max(y_world_test_new); %-20 %her lowest Outlier:40 %TRY 100 
+
 
 %% Output Accuracy Metrics
 
