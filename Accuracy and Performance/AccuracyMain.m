@@ -21,8 +21,8 @@ load("stereoParamsAccuracy.mat");
 pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
 threshold = 250; % Threshold for Grayscale 
 
-readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
-readerRight = VideoReader('myRightTrialHoriz5cm.avi');
+readerLeft = VideoReader('myLeftTrialNormalMovement.avi');
+readerRight = VideoReader('myRightTrialNormalMovement.avi');
 
 %Set up for skipping n frames
 nFramesLeft = readerLeft.NumFrames;
@@ -57,7 +57,6 @@ elapsed_initialized = toc; %Assign toc to initialization time
 
 %% Marker tracking and robot movement
 close all;
-clear point3d_1_Accuracy;
 point3d_1_Accuracy(:,3) = zeros();
 
 %Initialize Arrays
@@ -73,7 +72,6 @@ v.FrameRate = 30;
 open(v)
 
 frames_skip = 5;
-
 
 for k = 1:frames_skip:nFramesLeft
 tic %Starts pre-processing timer
@@ -106,8 +104,8 @@ point3d_2 = triangulate(centroidLeft(2,:),centroidRight(2,:),stereoParams);
 point3d_3 = triangulate(centroidLeft(3,:),centroidRight(3,:),stereoParams);
 
 %Find surgical tip location
-[surgicalTip_Accuracy(k,:), rotMatrix] = findSurgicalTip(point3d_1,point3d_2,point3d_3, pivotOffset);
-[surgicalTip, rotMatrix] = findSurgicalTip(point3d_1,point3d_2,point3d_3, pivotOffset);
+surgicalTip_Accuracy(k,:) = findSurgicalTip(point3d_1,point3d_2,point3d_3, pivotOffset);
+surgicalTip = findSurgicalTip(point3d_1,point3d_2,point3d_3, pivotOffset);
 
 elapsed_2(k) = toc; %end find tip timer
 
@@ -131,9 +129,8 @@ player(rgb);
 
 tic; %start world2microscope timer
 [xMicroscope, yMicroscope, zMicroscope] = world2Microscope(surgicalTip(1), surgicalTip(2), surgicalTip(3)); %World to Microscope Coordinate Mapping
-elapsed_3(k) = toc;
-
 [xMicroscope, yMicroscope, zMicroscope] = safetyprotocols(xMicroscope, yMicroscope, zMicroscope); %Implementation of Safety Protocols
+elapsed_3(k) = toc;
 
 tic; %start control system timer
 q0 = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot); %Send Coordinates to AT03 Robot
@@ -145,9 +142,14 @@ end
 
 release(player)
 close(v);  
+%% Output performance metrics
+
+[T, Equiv_FPS_Rate] = systemPerformance(elapsed_1,elapsed_2, elapsed_3, elapsed_4);
+
+disp(T);
+fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 
 %% Output Accuracy Metrics
 
-[Tracked_Displacement,Accuracy] = trackingAccuracy(point3d_1_Accuracy(:,1),50);
-T = table(Tracked_Displacement, Accuracy);
-disp(T);
+[Tracked_Displacement,Accuracy] = trackingAccuracy(point3d_1_Accuracy(:,1),100);
+T = table(Tracked_Displacement, Accuracy)
