@@ -129,9 +129,8 @@ player(rgb);
 
 tic; %start world2microscope timer
 [xMicroscope, yMicroscope, zMicroscope] = world2Microscope(surgicalTip(1), surgicalTip(2), surgicalTip(3)); %World to Microscope Coordinate Mapping
-elapsed_3(k) = toc;
-
 [xMicroscope, yMicroscope, zMicroscope] = safetyprotocols(xMicroscope, yMicroscope, zMicroscope); %Implementation of Safety Protocols
+elapsed_3(k) = toc;
 
 tic; %start control system timer
 q0 = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot); %Send Coordinates to AT03 Robot
