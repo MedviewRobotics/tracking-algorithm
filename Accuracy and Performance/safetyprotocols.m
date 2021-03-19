@@ -3,10 +3,10 @@ function [xMicroscope, yMicroscope, zMicroscope] = safetyprotocols(xMicroscope_I
 %   Detailed explanation goes here
 
 %Z from Tracking Output
-if xMicroscope_In<50
-     xMicroscope = 50;
-elseif xMicroscope_In>100
-     xMicroscope = 100;
+if xMicroscope_In<40
+     xMicroscope = 40;
+elseif xMicroscope_In>110
+     xMicroscope = 110;
 else
      xMicroscope = xMicroscope_In;
 end
@@ -14,10 +14,10 @@ end
 
 
 %X from Tracking Output
-if yMicroscope_In<-45
-     yMicroscope = -45;
-elseif yMicroscope_In>45
-     yMicroscope = 4;
+if yMicroscope_In<-50
+     yMicroscope = -50;
+elseif yMicroscope_In>50
+     yMicroscope = 50;
 else
      yMicroscope = yMicroscope_In;
 end
