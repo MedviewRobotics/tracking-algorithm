@@ -93,7 +93,7 @@ v = VideoWriter('accuracy.avi');
 v.FrameRate = 30;
 open(v)
 
-frames_skip = 5;
+frames_skip = 1;
 
 for k = 1:frames_skip:nFramesLeft
 tic %Starts pre-processing timer
@@ -262,7 +262,12 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 %% Output Accuracy Metrics
 %Horizontal 100
 TAcc = trackingAccuracy(surgicalTip_Accuracy(1,:),100,Robot_Accuracy(2,:));
+
+figure;
+subplot(211)
 plot(surgicalTip_Accuracy(1,:));
+subplot(212)
+plot(Robot_Accuracy(2,:));
 
 %Vertical 50
 % TAcc = trackingAccuracy(surgicalTip_Accuracy(2,:),100,Robot_Accuracy(3,:));
