@@ -143,8 +143,14 @@ end
 
 release(player)
 close(v);  
+%% Output performance metrics
+
+[T, Equiv_FPS_Rate] = systemPerformance(elapsed_1,elapsed_2, elapsed_3, elapsed_4);
+
+disp(T);
+fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 
 %% Output Accuracy Metrics
 
 [Tracked_Displacement,Accuracy] = trackingAccuracy(point3d_1_Accuracy(:,1),100);
-T = table(Tracked_Displacement, Accuracy);
+T = table(Tracked_Displacement, Accuracy)
