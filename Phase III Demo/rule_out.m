@@ -1,25 +1,51 @@
 
 addpath(genpath('Accuracy Trials'));
 load("stereoParamsAccuracy.mat");
-threshold = 250;
+threshold = 245;
 player = vision.DeployableVideoPlayer('Location',[10,100]);
-readerLeft = VideoReader('myLeftTrialDepth5cm.avi');
+
+readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
 readerRight = VideoReader('myRightTrialHoriz5cm.avi');
 
+%Set up for skipping n frames
+nFramesLeft = readerLeft.NumFrames;
+vidHeightLeft = readerLeft.Height;
+vidWidthLeft = readerLeft.Width;
+nFramesRight = readerRight.NumFrames; 
+vidHeightRight = readerRight.Height;
+vidWidthRight = readerRight.Width;
+
+mov(1:nFramesLeft) = ...
+    struct('readerLeft',zeros(vidHeightLeft,vidWidthLeft, 3,'uint8'),...
+           'readerRight',zeros(vidHeightRight,vidWidthRight, 3,'uint8'),...
+           'colormap',[]);
+
+for k = 1:nFramesLeft
+mov(k).readerLeft = read(readerLeft,k);
+mov(k).readerRight = read(readerRight,k);
+end
+
+% Set blob analysis handling
 hblob = vision.BlobAnalysis('AreaOutputPort', false, ... 
                                 'CentroidOutputPort', true, ... 
                                 'BoundingBoxOutputPort', true', ...
                                 'MinimumBlobArea', 1, ...
                                 'MaximumBlobArea', 20000, ...
                                 'MaximumCount',3);
+
+                                              
 %%
 
 markerLocations(1:235,2) = zeros;
 count = 1;
 warningCount = 1;
-while hasFrame(readerRight)
+frameLeftGray_hist(720,1280,235) = zeros; 
+frameLeftGray_hist_1(720,1280,235) = zeros; 
+
+for k = 1:nFramesLeft
 %Read Frames
-frameLeft = readFrame(readerRight);
+frameLeft = mov(k).readerLeft;
+frameRight = mov(k).readerRight;
 
 % frameRight = readFrame(readerRight);
 
@@ -38,19 +64,24 @@ frameLeftGray([1:200 550:M],1:N,:)=0;
 %Detect markers in the Left 
 img_left = frameLeftGray > threshold; %Creates binary image
 img_left = bwareaopen(img_left, 22);
-%figure;imshow(img_left);title('pre-dilation')
-img_left = imdilate(img_left,strel('disk',5));
+%figure;imshow(img_left);title('pre-filter')
+% cc_1 = bwconncomp(img_left);
+% stats_1 = regionprops(cc_1,'Area','Centroid','BoundingBox','Eccentricity','Circularity','Extent','EquivDiameter'); 
+% idx_1 = find([stats_1.Eccentricity] > 0.1 & [stats_1.Eccentricity] < 0.67);
+% BW2_1 = ismember(labelmatrix(cc_1),idx);  
+% figure;imshow(BW2_1);title('GET RID OF LINE')
+frameLeftGray_hist_1(:,:,k) = img_left;
+img_left = imerode(img_left,strel('disk',1));
+img_left = imdilate(img_left,strel('disk',6));
+%img_left = imerode(img_left,strel('disk',2));
+frameLeftGray_hist(:,:,k) = img_left;
 %filter out pixels below 200
 %img_left = bwareaopen(img_left, 200);
 
 cc = bwconncomp(img_left);
 stats = regionprops(cc,'Area','Centroid','BoundingBox','Eccentricity','Circularity','Extent','EquivDiameter'); 
-idx = find([stats.Area] > 190 & [stats.Area] < 550 & [stats.Eccentricity] > 0.2 & [stats.Eccentricity] < 0.65);% & ...
-    %[stats.Circularity] > 1 & [stats.Circularity] < 1.2 & [stats.Extent] > 0.7 );
-% idx = find([stats.Area] > 200 & [stats.Area] < 450 & [stats.Eccentricity] > 0.35 & [stats.Eccentricity] < 0.85 );%& [stats.Circularity] > 0.7 & [stats.Circularity] < 1.3);
+idx = find([stats.Area] > 165 & [stats.Area] < 550 & [stats.Eccentricity] > 0.1 & [stats.Eccentricity] < 0.67);% & ...
 BW2 = ismember(labelmatrix(cc),idx);  
-
-%[centersBright, ~] = imfindcircles(img_left,[10 30],'ObjectPolarity','bright');
 %BW_left = bwareafilt(BW2,3,'largest'); %Extract 3 largest blobs
 
 [centroidLeft,bboxLeft] = step(hblob,BW2);
@@ -83,8 +114,9 @@ try
     rgb = insertText(rgb,centroidLeft(3,:)+20,['X: ' num2str(round(centroidLeft(3,1)),'%d')...
     ' Y: ' num2str(round(centroidLeft(3,2)),'%d')],'FontSize',18); 
 catch
-    warning(['Marker not found in Frame' num2str(warningCount)]);
+    warning(['Marker not found in Frame ' num2str(k)]);
     warningCount = warningCount + 1;
+    disp([num2str([stats_1(:,:).Area stats_1.Eccentricity])])
     %figure;imshow(img_left)
 end
 
@@ -119,7 +151,7 @@ disp(['accuracy = ' num2str(100 - (warningCount/235)*100)])
 % stats = regionprops(cc,'All');
 % a = [];
 % a = vertcat(a,stats.Centroid);
-% % %b = a(1,:); c = a(2,:);
+%b = a(1,:); c = a(2,:);
 % % %norm(b-c)
 % % 
 % for i = 1:length(a)
@@ -153,9 +185,31 @@ disp(['accuracy = ' num2str(100 - (warningCount/235)*100)])
 %BW = bwareaopen(img_left, 260);figure;imshow(BW)
 
 %%
+% 
+% [bw2,centroids,diffFrameColor] = detectmarkerColorDark(frameLeft,250,1,5);
+% figure;imshow(bw2)
 
-[bw2,centroids,diffFrameColor] = detectmarkerColorDark(frameLeft,250,1,5);
-figure;imshow(bw2)
+
+pre_dilate_img = frameLeftGray_hist_1(:,:,232);
+post_dilate_img = frameLeftGray_hist(:,:,232);
+
+figure;imshowpair(pre_dilate_img,post_dilate_img,'montage')
+
+img_left_1 = imerode(pre_dilate_img,strel('disk',1));
+img_left_2 = imdilate(img_left_1,strel('disk',6));
+
+figure;montage({pre_dilate_img,img_left_1,img_left_2})
+
+ccc = bwconncomp(img_left_2);
+stats_1 = regionprops(ccc,'All');
+
+
+
+
+
+
+
+
 
 
 
