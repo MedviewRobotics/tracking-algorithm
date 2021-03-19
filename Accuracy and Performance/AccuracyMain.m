@@ -193,7 +193,7 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 
 %% Output Accuracy Metrics
 %Horizontal 100
-[Tracked_Displacement,Accuracy] = trackingAccuracy(surgicalTip_Accuracy(1,:),100);
+%[Tracked_Displacement,Accuracy] = trackingAccuracy(surgicalTip_Accuracy(1,:),100);
 %plot(surgicalTip_Accuracy(1,:))
 
 %Vertical 50
@@ -201,8 +201,8 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 %plot(surgicalTip_Accuracy(2,:))
 
 %Depth 50
-% [Tracked_Displacement,Accuracy] = trackingAccuracy(surgicalTip_Accuracy(3,:),50);
-% plot(surgicalTip_Accuracy(3,:))
+[Tracked_Displacement,Accuracy] = trackingAccuracy(surgicalTip_Accuracy(3,:),50);
+plot(surgicalTip_Accuracy(3,:))
 
 
 T = table(Tracked_Displacement, Accuracy)

@@ -139,13 +139,81 @@ function plot3d(robot, q, varargin)
         robot.points = cell(1, robot.n+1);
         robot.faces = cell(1, robot.n+1);
         fprintf('Loading STL models from ARTE Robotics Toolbox for Education  by Arturo Gil (http://arvc.umh.es/arte)');
-        for i=1:nshapes-1
-            [P,F] = stlRead( fullfile(pth, sprintf('link%d.stl', i-1)) );
-            robot.points{i} = P;
-            robot.faces{i} = F;
-            fprintf('.');
-            
-        end
+        for i=1
+             [P,F] = stlRead( fullfile(pth, sprintf('link%d.stl', i-1)) );
+             P(:,2)=P(:,2) -70;
+              P(:,1)=P(:,1) -80;
+               P(:,3)=P(:,3) -30;
+              robot.points{i} = P;
+              robot.faces{i} = F;
+              fprintf('.');
+        end 
+         for i=2
+             [P,F] = stlRead( fullfile(pth, sprintf('link%d.stl', i-1)) );
+             P(:,2)=P(:,2) -25; % Z direction 
+             P(:,1)=P(:,1) -50;
+             P(:,3)=P(:,3) -50;
+              robot.points{i} = P;
+              robot.faces{i} = F;
+              fprintf('.');
+         end
+         
+         for i=3
+             [P,F] = stlRead( fullfile(pth, sprintf('link%d.stl', i-1)) );
+             P(:,2)=P(:,2) -17;
+             P(:,1)=P(:,1) -140; % up/down
+             P(:,3)=P(:,3) -22; % LR good don't touch
+              robot.points{i} = P;
+              robot.faces{i} = F;
+              fprintf('.');
+         end
+         
+         for i=4
+             [P,F] = stlRead( fullfile(pth, sprintf('link%d.stl', i-1)) );
+             P(:,2)=P(:,2) -20;
+             P(:,1)=P(:,1) -12; % up/down
+             P(:,3)=P(:,3) -29; % LR good don't touch
+              robot.points{i} = P;
+              robot.faces{i} = F;
+              fprintf('.');
+         end
+         
+          for i=5
+             [P,F] = stlRead( fullfile(pth, sprintf('link%d.stl', i-1)) );
+             P(:,2)=P(:,2) -23;
+             P(:,1)=P(:,1) -10; % up/down
+             P(:,3)=P(:,3) -36.5; % LR good don't touch
+              robot.points{i} = P;
+              robot.faces{i} = F;
+              fprintf('.');
+          end
+         
+          for i=6
+             [P,F] = stlRead( fullfile(pth, sprintf('link%d.stl', i-1)) );
+             P(:,2)=P(:,2) -5;
+             P(:,1)=P(:,1) -15; % up/down
+             P(:,3)=P(:,3) -14; % LR good don't touch
+              robot.points{i} = P;
+              robot.faces{i} = F;
+              fprintf('.');
+          end
+          for i=7
+              [P,F] = stlRead( fullfile(pth, sprintf('link%d.stl', i-1)) );
+              P(:,2)=P(:,2) -10;
+              P(:,1)=P(:,1) -5 ; % up/down
+              P(:,3)=P(:,3) + 7; % up and down
+              robot.points{i} = P;
+              robot.faces{i} = F;
+              fprintf('.');
+              
+          end
+%         for i=6:nshapes
+%             [P,F] = stlRead( fullfile(pth, sprintf('link%d.stl', i-1)) );
+%             robot.points{i} = P;
+%             robot.faces{i} = F;
+%             fprintf('.');
+%             
+%         end
         fprintf('\n');
     end
     
