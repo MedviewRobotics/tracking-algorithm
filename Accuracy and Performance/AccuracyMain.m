@@ -129,9 +129,8 @@ player(rgb);
 
 tic; %start world2microscope timer
 [xMicroscope, yMicroscope, zMicroscope] = world2Microscope(surgicalTip(1), surgicalTip(2), surgicalTip(3)); %World to Microscope Coordinate Mapping
-elapsed_3(k) = toc;
-
 [xMicroscope, yMicroscope, zMicroscope] = safetyprotocols(xMicroscope, yMicroscope, zMicroscope); %Implementation of Safety Protocols
+elapsed_3(k) = toc;
 
 tic; %start control system timer
 q0 = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot); %Send Coordinates to AT03 Robot
@@ -143,8 +142,14 @@ end
 
 release(player)
 close(v);  
+%% Output performance metrics
+
+[T, Equiv_FPS_Rate] = systemPerformance(elapsed_1,elapsed_2, elapsed_3, elapsed_4);
+
+disp(T);
+fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 
 %% Output Accuracy Metrics
 
 [Tracked_Displacement,Accuracy] = trackingAccuracy(point3d_1_Accuracy(:,1),100);
-T = table(Tracked_Displacement, Accuracy);
+T = table(Tracked_Displacement, Accuracy)

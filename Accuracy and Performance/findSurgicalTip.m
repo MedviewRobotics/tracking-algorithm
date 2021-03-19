@@ -1,4 +1,4 @@
-function [surgicalTip_3D, normal, planefunction, zplane] = findSurgicalTip(green_3D,blue_3D,red_3D, pivotOffset)
+function [surgicalTip_3D, rotMatrix] = findSurgicalTip(green_3D,blue_3D,red_3D, pivotOffset)
 
 %Determine point X between blue and green marker (37.5 mm away from green)
 g2b = blue_3D - green_3D;
@@ -12,11 +12,10 @@ m2r_norm = m2r/norm(m2r);
 %Find location of surgical tip
 surgicalTip_3D = midpoint + m2r_norm*pivotOffset;
 
-%Find orientation 
-normal = cross(green_3D-blue_3D, green_3D-red_3D);
-syms x y z
-P = [x,y,z];
-planefunction = dot(normal, P-green_3D);
-zplane = solve(planefunction, z);
+%Find rotation matrix
+A=orth([green_3D(:)-blue_3D(:),green_3D(:)-red_3D(:)]);
+B=[1 0 0; 0 1 0].';
+reg=absor(A,B,'doTrans',0);
+rotMatrix=reg.R;
 
 end
