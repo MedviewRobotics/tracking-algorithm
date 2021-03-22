@@ -1,4 +1,4 @@
-function [xMicroscope, yMicroscope, zMicroscope] = safetyprotocols(xMicroscope_In, yMicroscope_In, zMicroscope_In)
+function [xMicroscope, yMicroscope, zMicroscope] = safetyProtocols(xMicroscope_In, yMicroscope_In, zMicroscope_In)
 %SAFETYPROTOCOLS Summary of this function goes here
 %   Detailed explanation goes here
 
