@@ -21,8 +21,8 @@ load("stereoParamsAccuracy.mat");
 pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
 threshold = 245; % Threshold for Grayscale 
 
-readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
-readerRight = VideoReader('myLeftTrialHoriz10cm.avi');
+readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
+readerRight = VideoReader('myLeftTrialHoriz5cm.avi');
 
 % readerLeft = VideoReader('myLeftTrialDepth5cm.avi');
 % readerRight = VideoReader('myRightTrialDepth5cm.avi');
@@ -174,14 +174,27 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 
 %% Output Accuracy Metrics
 %Vert 50
-TAcc = trackingAccuracy(surgicalTip_3D_norm(1,:),100,Robot_Accuracy(1,:))
+TAcc = trackingAccuracy(surgicalTip_3D_norm(1,:),50,Robot_Accuracy(1,:))
+
 figure;
-subplot(211)
+subplot(321)
 plot(surgicalTip_3D(1,6:235));
-title('Surgical Tip Position');
-subplot(212)
+title('Surgical Tip Position X');
+subplot(322)
 plot(surgicalTip_3D_norm(1,6:235));
-title('Normalized Surgical Tip Position');
+title('Normalized Surgical Tip Position X');
+subplot(323)
+plot(surgicalTip_3D(2,6:235));
+title('Surgical Tip Position Y');
+subplot(324)
+plot(surgicalTip_3D_norm(2,6:235));
+title('Normalized Surgical Tip Position Y');
+subplot(325)
+plot(surgicalTip_3D(3,6:235));
+title('Surgical Tip Position Z');
+subplot(326)
+plot(surgicalTip_3D_norm(3,6:235));
+title('Normalized Surgical Tip Position Z');
 
 
 disp(TAcc);
