@@ -21,11 +21,11 @@ load("stereoParamsAccuracy.mat");
 pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
 threshold = 245; % Threshold for Grayscale 
 
-% readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
-% readerRight = VideoReader('myRightTrialHoriz10cm.avi');
+readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
+readerRight = VideoReader('myLeftTrialHoriz10cm.avi');
 
-readerLeft = VideoReader('myLeftTrialDepth5cm.avi');
-readerRight = VideoReader('myRightTrialDepth5cm.avi');
+% readerLeft = VideoReader('myLeftTrialDepth5cm.avi');
+% readerRight = VideoReader('myRightTrialDepth5cm.avi');
 
 % readerLeft = VideoReader('myLeftTrialDepth5cm.avi');
 % readerRight = VideoReader('myRightTrialDepth5cm.avi');
@@ -69,7 +69,7 @@ clear Robot_Accuracy;
 %Initialize Arrays
 surgicalTip_3D = zeros(3,235);
 surgicalTip_3D_norm = zeros(3,235);
-surgicalTip_3D_normdev = zeros(3,235);
+surgicalTip_3D_dev = zeros(3,235);
 deviation = zeros(3,235);
 Robot_Accuracy = zeros(3,235);
 elapsed_1 = zeros(1, 235);
@@ -95,13 +95,17 @@ frameRight = mov(k).readerRight;
 %Initate preprocessing of frames
 [frameLeftGray,frameRightGray] = preprocessFrames(frameLeft,frameRight);
 
-elapsed_1(k) = toc; %End preprocessing phase
+%End preprocessing phase
+elapsed_1(k) = toc; 
 
-tic; %Start timer for finding tip
+%Start timer for finding tip
+tic; 
 
+%Find centroids in left and right frames
 [centroidLeft, bboxLeft, centroidRight, bboxRight] = ...
     findCentroids(frameLeftGray,frameRightGray,threshold,hblob);
 
+%Validate position of centroids
 if size(centroidLeft) ~= [3 3] | size(centroidRight) ~= [3 3]
     warning(['Could not find marker(s) in frame: ', num2str(k)])
     surgicalTip_3D(:, k) = surgicalTip_3D(:, k-1);
@@ -111,9 +115,8 @@ else
     [point3d_1,point3d_2, point3d_3] = findWorldCoordinates(centroidLeft,centroidRight,stereoParams);
     [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(point3d_1,point3d_2,point3d_3,pivotOffset);
     if k > 5
-        surgicalTip_3D_norm(1, k) = mean(surgicalTip_3D(1, k-5:k));
-        surgicalTip_3D_norm(2, k) = mean(surgicalTip_3D(2, k-5:k));
-        surgicalTip_3D_norm(3, k) = mean(surgicalTip_3D(3, k-5:k));
+        %add check for stdv
+        surgicalTip_3D_norm(:,k) = weightedAverage(surgicalTip_3D(:,:), k);
     end
     elapsed_2(k) = toc; %End find tip timer
     
@@ -136,15 +139,26 @@ else
     writeVideo(v,rgb);
 end
 
-tic; %Start world2microscope timer
+%Start world2microscope timer
+tic;  
+
+%Find location in microscopecoordinates
 [xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D_norm(1, k), surgicalTip_3D_norm(2, k), surgicalTip_3D_norm(3, k)); %World to Microscope Coordinate Mapping
+
+%End world2microscope timer
 elapsed_3(k) = toc;
 
-tic; %Start control system timer
+%Start control system timer
+tic; 
+
+%Initiate control system
 [xMicroscope, yMicroscope, zMicroscope] = safetyProtocols(xMicroscope, yMicroscope, zMicroscope); %Implementation of Safety Protocols
 [q0,X,Y,Z] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot); %Send Coordinates to AT03 Robot
+
+%End control system timer
 elapsed_4(k) = toc;
 
+%Log control system accuracy
 Robot_Accuracy(:,k) = [X,Y,Z];
 end
 
@@ -160,15 +174,15 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 
 %% Output Accuracy Metrics
 %Vert 50
-TAcc = trackingAccuracy(surgicalTip_3D_norm(3,:),50,Robot_Accuracy(2,:));
-
+TAcc = trackingAccuracy(surgicalTip_3D_norm(1,:),100,Robot_Accuracy(1,:))
 figure;
 subplot(211)
-plot(surgicalTip_3D(2,6:235));
+plot(surgicalTip_3D(1,6:235));
 title('Surgical Tip Position');
 subplot(212)
-plot(surgicalTip_3D_norm(2,6:235));
+plot(surgicalTip_3D_norm(1,6:235));
 title('Normalized Surgical Tip Position');
+
 
 disp(TAcc);
 
