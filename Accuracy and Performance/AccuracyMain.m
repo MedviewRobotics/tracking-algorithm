@@ -70,6 +70,7 @@ elapsed_initialized = toc; %Assign toc to initialization time
 %% Marker tracking and robot movement
 close all;
 
+
 %Initialize Arrays
 surgicalTip_3D = zeros(3, nFramesLeft);
 surgicalTip_3D_norm = zeros(3, nFramesLeft);
@@ -81,14 +82,18 @@ elapsed_3 = zeros(1, nFramesLeft);
 elapsed_4 = zeros(1, nFramesLeft);
 Q = zeros(10, 6, nFramesLeft);
 
+
 %Initialize Video Player
 player = vision.DeployableVideoPlayer('Location',[10,100]);
 v = VideoWriter('accuracy.avi');
 v.FrameRate = 30;
 open(v)
 
-frames_skip = 1;
+%%IMPORTANT%%
+%Are you running this video for the first time (1 = Yes, 0 = No)
+Origin_needed = 0;
 
+frames_skip = 1;
 for k = 1:frames_skip:nFramesLeft
 tic %Starts pre-processing timer
 
@@ -122,7 +127,7 @@ else
         [surgicalTip_3D_norm(:,k)] = weightedAverage(surgicalTip_3D(:,:), k);
     end
     elapsed_2(k) = toc; %End find tip timer
-    
+
     %Plotting in video player
     rgb = insertShape(frameLeft,'rectangle',bboxLeft(1,:),'Color','black',...
         'LineWidth',3);
@@ -162,11 +167,10 @@ elapsed_4(k) = toc;
 
 %Log control system accuracy
 Robot_Accuracy(:,k) = [X,Y,Z];
-
 end
 
 release(player)
-close(v);  
+close(v); 
 
 %% Joint stress testing
 
@@ -176,6 +180,7 @@ close(v);
 %     Joint4(count*10 - 9:10*count,1) = Q(:,4);
 %     Joint5(count*10 - 9:10*count,1) = Q(:,5);
 %     Joint6(count*10 - 9:10*count,1) = Q(:,6);
+
 
 %% Output performance metrics
 
@@ -187,6 +192,7 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 %Vert 50
 TAcc = trackingAccuracy(surgicalTip_3D_norm(2,:),50,Robot_Accuracy(3,:))
 disp(TAcc);
+
 
 figure;
 subplot(321)
