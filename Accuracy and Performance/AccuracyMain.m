@@ -61,7 +61,7 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ...
 
 [Robot,q0] = initializeMicroscope();
 
-[x_origin,y_origin, z_origin] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams)
+[x_origin,y_origin, z_origin] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
 
 disp('Initialization Completed.');
 
