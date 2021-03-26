@@ -68,6 +68,7 @@ clear Robot_Accuracy;
 
 surgicalTip_Accuracy = zeros(3,235);
 Robot_Accuracy = zeros(3,235);
+count = 1;
 
 %Initialize Arrays
 elapsed_1 = zeros(1, 235);
@@ -75,26 +76,17 @@ elapsed_2 = zeros(1, 235);
 elapsed_3 = zeros(1, 235);
 elapsed_4 = zeros(1, 235);
 
-count = 1;
-x_world_test_new = 0;
-y_world_test_new = 0;
-z_world_test_new = 0;
-x_world_test_micro = 0;
-y_world_test_micro = 0;
-z_world_test_micro = 0;
-x_world_test_micro_2 = 0;
-y_world_test_micro_2 = 0;
-z_world_test_micro_2 = 0;
-tester = 0;
-
 %Initialize Video Player
 player = vision.DeployableVideoPlayer('Location',[10,100]);
 v = VideoWriter('accuracy.avi');
 v.FrameRate = 30;
 open(v)
 
-frames_skip = 1;
+%%IMPORTANT%%
+%Are you running this video for the first time (1 = Yes, 0 = No)
+Origin_needed = 0;
 
+frames_skip = 1;
 for k = 1:frames_skip:nFramesLeft
 tic %Starts pre-processing timer
 
@@ -160,6 +152,7 @@ try
     [surgicalTip_3D, rotMatrix] = findSurgicalTip(point3d_1,point3d_2,point3d_3,pivotOffset);
 catch
 end
+
 surgicalTip_Accuracy(1:3,k) = surgicalTip_3D;
 elapsed_2(k) = toc; %end find tip timer
 try
@@ -186,71 +179,43 @@ catch
     surgicalTip_3D = surgicalTip_Accuracy(1:3,k-1);
 end
 
-count = count + 1;
-x_world_test_new(count) = surgicalTip_3D(1);
-y_world_test_new(count) = surgicalTip_3D(2);
-z_world_test_new(count) = surgicalTip_3D(3);
+if Origin_needed == 1
+    %%-------Find Origin Section------%%
+    %DO NOT REMOVE, The following code is needed to run with the video for the
+    %first run, to calculate the origin. The first time running a new video,
+    %run without computing "world2Microscope_Accuracy," "safetyprotocols," and
+    %"moveMicroscope"
+    count = count + 1;
+    x_world_test_new(count) = surgicalTip_3D(1);
+    y_world_test_new(count) = surgicalTip_3D(2);
+    z_world_test_new(count) = surgicalTip_3D(3);
+    if count == nFramesLeft
+        [x_origin,y_origin,z_origin] = find_origin(x_world_test_new,y_world_test_new,z_world_test_new);
+        disp("Origin has been found. You may comment out Find Origin Section" + newline + "and you can now perform tests for this video by uncommenting regular pipeline");
+    end
+    %%-------------%%
 
-tic; %start world2microscope timer
-[xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D(1), surgicalTip_3D(2), surgicalTip_3D(3)); %World to Microscope Coordinate Mapping
-elapsed_3(k) = toc;
+else
+    tic; %start world2microscope timer
+    [xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D(1), surgicalTip_3D(2), surgicalTip_3D(3),x_origin,y_origin,z_origin); %World to Microscope Coordinate Mapping
+    elapsed_3(k) = toc;
+    
+    tic; %start control system timer
+    [xMicroscope, yMicroscope, zMicroscope] = safetyprotocols(xMicroscope, yMicroscope, zMicroscope); %Implementation of Safety Protocols
+    
+    [q0,X,Y,Z] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot); %Send Coordinates to AT03 Robot
+    elapsed_4(k) = toc;
+    Robot_Accuracy(1:3,k) = [X,Y,Z];
+end
 
-x_world_test_micro(count) = xMicroscope;
-y_world_test_micro(count) = yMicroscope;
-z_world_test_micro(count) = zMicroscope;
+end
 
-tic; %start control system timer
-[xMicroscope, yMicroscope, zMicroscope] = safetyprotocols(xMicroscope, yMicroscope, zMicroscope); %Implementation of Safety Protocols
-
-x_world_test_micro_2(count) = xMicroscope;
-y_world_test_micro_2(count) = yMicroscope;
-z_world_test_micro_2(count) = zMicroscope;
-
-[q0,X,Y,Z] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot); %Send Coordinates to AT03 Robot
-elapsed_4(k) = toc;
-
-Robot_Accuracy(1:3,k) = [X,Y,Z];
+if Origin_needed ~= 1
+    disp("Test Completed");
 end
 
 release(player)
 close(v);  
-%% TS
-
-figure;
-subplot(311)
-plot(y_world_test_new);
-title ('Surgical Tip Local Coordinates - "Y" from Tracking')
-subplot(312)
-plot(z_world_test_micro);
-title ('Surgical Tip World Coordinates - "Z" for Ctrl Sys')
-subplot(313)
-plot(z_world_test_micro_2);
-title ('Surgical Tip World Coordinates with Saftety Bounds - "Z" for Ctrl Sys')
-xlabel('Frame #');
-
-figure;
-subplot(311)
-plot(x_world_test_new);
-title ('Surgical Tip Local Coordinates - "X" from Tracking')
-subplot(312)
-plot(y_world_test_micro);
-title ('Surgical Tip World Coordinates - "Y" for Ctrl Sys')
-subplot(313)
-plot(y_world_test_micro_2);
-title ('Surgical Tip World Coordinates with Saftety Bounds - "Y" for Ctrl Sys')
-xlabel('Frame #');
-
-figure;
-subplot(311)
-plot(z_world_test_new);
-title ('Surgical Tip Local Coordinates - "Z" from Tracking')
-subplot(312)
-plot(x_world_test_micro);
-title ('Surgical Tip World Coordinates - "X for Ctrl Sys')
-subplot(313)
-plot(x_world_test_micro_2);
-title ('Surgical Tip World Coordinates with Saftety Bounds - "X" for Ctrl Sys')
-xlabel('Frame #');
 
 %% Output performance metrics
 
@@ -262,12 +227,16 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 %% Output Accuracy Metrics
 %Horizontal 100
 TAcc = trackingAccuracy(surgicalTip_Accuracy(1,:),100,Robot_Accuracy(2,:));
+disp(TAcc);
 
 figure;
 subplot(211)
 plot(surgicalTip_Accuracy(1,:));
+title('Tracking System - Surgical Tip Location');
 subplot(212)
 plot(Robot_Accuracy(2,:));
+title('Control System Forward Kinematics - End Effector Pose');
+xlabel('Frame #');
 
 %Vertical 50
 % TAcc = trackingAccuracy(surgicalTip_Accuracy(2,:),100,Robot_Accuracy(3,:));
@@ -277,7 +246,7 @@ plot(Robot_Accuracy(2,:));
 % TAcc = trackingAccuracy(surgicalTip_Accuracy(3,:),100,Robot_Accuracy(1,:));
 %plot(surgicalTip_Accuracy(3,:))
 
-disp(TAcc);
+
 
 
 
