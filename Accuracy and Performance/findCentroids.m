@@ -1,3 +1,29 @@
+%FINDCENTROIDS determines the location of the three markers.
+%
+%   [centroidLeft, bboxLeft, centroidRight, bboxRight] = findCentroids(frameLeftGray,frameRightGray, threshold, hblob) 
+%   determines the location of the three active markers in pixel
+%   coordinates, as well as their respective bounding boxes. The pixel
+%   coordinates and bounding boxes are computed separately.
+%   
+%   INPUTS:
+%       frameLeftGray = camera input from left camera after pre-processing
+%       frameRightGray = camera input from right camera after pre-processing
+%       threshold = intensity threshold of the markers
+%       hblob = parameters for isolating the marker locations, 1x1
+%           BlobAnalysis
+%
+%   OUTPUTS:
+%       centroidLeft = location of all three markers in pixel coordinates
+%           from the perspective of the left camera, stored in 3x2 matrix.
+%       centroidRight = location of all three markers in pixel coordinates
+%           from the perspective of the right camera, stored in 3x2 matrix.
+%       bboxLeft = location of the bounding box used to illustrate the
+%           location of the markers in the videoplayer demonstration for 
+%           left camera, stored in 3x4 matrix.
+%       bboxRight = location of the bounding box used to illustrate the
+%           location of the markers in the videoplayer demonstration for 
+%           right camera, stored in 3x4 matrix.
+
 function [centroidLeft, bboxLeft, centroidRight, bboxRight] = findCentroids(frameLeftGray,frameRightGray, threshold, hblob)
 
 %Detect markers in the Left 

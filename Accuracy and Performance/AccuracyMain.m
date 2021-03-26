@@ -6,6 +6,7 @@
 % Author #1: Ginette Hartell - 500755250
 % Author #2: Mohammad Aziz Uddin - 500754765
 % Author #3: Jay Tailor - 500750496
+% Author #4: Claudia Alonzo - 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Initialize Peter Corke's Toolbox 
 petercorkeinitialize();
@@ -69,7 +70,6 @@ elapsed_initialized = toc; %Assign toc to initialization time
 
 %% Marker tracking and robot movement
 close all;
-
 
 %Initialize Arrays
 surgicalTip_3D = zeros(3, nFramesLeft);
@@ -213,5 +213,3 @@ title('Surgical Tip Position Z');
 subplot(326)
 plot(surgicalTip_3D_norm(3,12:235));
 title('Normalized Surgical Tip Position Z');
-
-
