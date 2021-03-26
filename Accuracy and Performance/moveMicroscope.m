@@ -1,11 +1,13 @@
-function [newq0,X,Y,Z,Q] = moveMicroscope(input_x,input_y,input_z,q0,AT03) %% change input arguments
+function [newq0,X,Y,Z,Q] = moveMicroscope(input_x,input_y,input_z,q0,AT03, k) %% change input arguments
 
-x = input_x; %new pose stream in
-y = input_y;%new pose _ stream in
-z = input_z; %new pose _ stream in
+%while i<20
+
 R = 3.1416;
 P = 0;
 Y = 0;
+
+%Call safety protocol function
+[x, y, z] = safetyProtocols(input_x, input_y, input_z); 
 
 % Get q_new to move to new pose
 T_start = transl(x,y,z) * rpy2tr(R,P,Y);
