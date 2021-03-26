@@ -1,3 +1,18 @@
+%PREPROCESSFRAMES performs pre-processing on frame inputs from cameras.
+%
+%   [frame_left_out,frame_right_out] = preprocessFrames(frame_left_in,frame_right_in)
+%   performs pre-processing on frame inputs from both the left and right
+%   cameras. This includes converting to grayscale, smoothing, sharpening,
+%   and spatial location filtering.
+%
+%   INPUTS:
+%       frame_left_in = input frame from left camera
+%       frame_right_in = input frame from right camera
+%
+%   OUTPUTS:
+%       frame_left_out = frame from left camera after pre-processing
+%       frame_right_out = frame from right camera after pre-processing
+
 function [frame_left_out,frame_right_out] = preprocessFrames(frame_left_in,frame_right_in)
 
 %Pre-process frames by converting to grayscale, smoothing, then sharpening

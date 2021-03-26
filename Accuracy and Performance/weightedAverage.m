@@ -1,3 +1,21 @@
+%WEIGHTEDAVERAGE normalizes current location of the surgical tip with
+%information from previous frames.
+%
+%   [surgicalTip_3D_norm] = weightedAverage(surgicalTip_3D, k) returns
+%   current normalized location of the surgical tip using raw data from the
+%   current frame and the last ten frames. Function first removes outlier
+%   values and then applies weighted averaging, giving the most weight to
+%   the most recent values.
+%    
+%   INPUTS:
+%       surgicalTip_3D = raw location of the current and past locations of
+%           the surgical tip,3xk matrix
+%       k = current frame
+%
+%   OUTPUTS:
+%       surgicalTip_3D_norm = new current 3D location of surgical tip, 1x3
+%           matrix
+
 function [surgicalTip_3D_norm] = weightedAverage(surgicalTip_3D, k)
 
 %Define weights
