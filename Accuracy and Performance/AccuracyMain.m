@@ -203,8 +203,17 @@ else
     tic; %start control system timer
     [xMicroscope, yMicroscope, zMicroscope] = safetyprotocols(xMicroscope, yMicroscope, zMicroscope); %Implementation of Safety Protocols
     
-    [q0,X,Y,Z] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot); %Send Coordinates to AT03 Robot
+    [q0,X,Y,Z,Q] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot); %Send Coordinates to AT03 Robot
     elapsed_4(k) = toc;
+    %Store Q
+    count = count + 1;
+    Joint1(count*10 - 9:10*count,1) = Q(:,1);
+    Joint2(count*10 - 9:10*count,1) = Q(:,2);
+    Joint3(count*10 - 9:10*count,1) = Q(:,3);
+    Joint4(count*10 - 9:10*count,1) = Q(:,4);
+    Joint5(count*10 - 9:10*count,1) = Q(:,5);
+    Joint6(count*10 - 9:10*count,1) = Q(:,6);
+
     Robot_Accuracy(1:3,k) = [X,Y,Z];
 end
 

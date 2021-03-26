@@ -1,6 +1,4 @@
-function [newq0,X,Y,Z] = moveMicroscope(input_x,input_y,input_z,q0,AT03) %% change input arguments
-
-%while i<20
+function [newq0,X,Y,Z,Q] = moveMicroscope(input_x,input_y,input_z,q0,AT03) %% change input arguments
 
 x = input_x; %new pose stream in
 y = input_y;%new pose _ stream in
