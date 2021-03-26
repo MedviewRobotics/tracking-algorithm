@@ -1,4 +1,4 @@
-function [newq0,X,Y,Z,Q] = moveMicroscope(input_x,input_y,input_z,q0,AT03) %% change input arguments
+function [newq0,X,Y,Z,Q] = moveMicroscope(input_x,input_y,input_z,q0,AT03, k) %% change input arguments
 
 %while i<20
 R = 3.1416;
@@ -24,8 +24,6 @@ T_start = AT03.fkine(q0);
 [X,Y,Z] = transl(T_start);
 
 newq0 = q0;
-
-end
 
 end
 

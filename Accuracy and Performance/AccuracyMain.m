@@ -79,7 +79,7 @@ elapsed_1 = zeros(1, nFramesLeft);
 elapsed_2 = zeros(1, nFramesLeft);
 elapsed_3 = zeros(1, nFramesLeft);
 elapsed_4 = zeros(1, nFramesLeft);
-Q = zeros(1, nFramesLeft);
+Q = zeros(10, 6, nFramesLeft);
 
 %Initialize Video Player
 player = vision.DeployableVideoPlayer('Location',[10,100]);
@@ -145,7 +145,7 @@ end
 %Start world2microscope timer
 tic;  
 
-%Find location in microscopecoordinates
+%Find location in microscope coordinates
 [xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D_norm(1, k), surgicalTip_3D_norm(2, k), surgicalTip_3D_norm(3, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
 
 %End world2microscope timer
@@ -155,7 +155,7 @@ elapsed_3(k) = toc;
 tic;
 
 %Initiate control system
-[q0,X,Y,Z,Q(k)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
+[q0,X,Y,Z,Q(:, :, k)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
 
 %End control system timer
 elapsed_4(k) = toc;
@@ -185,7 +185,7 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 
 %% Output Accuracy Metrics
 %Vert 50
-TAcc = trackingAccuracy(surgicalTip_3D_norm(2,:),50,Robot_Accuracy(2,:))
+TAcc = trackingAccuracy(surgicalTip_3D_norm(2,:),50,Robot_Accuracy(3,:))
 disp(TAcc);
 
 figure;

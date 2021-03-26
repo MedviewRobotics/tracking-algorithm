@@ -61,24 +61,25 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ...
 
 [Robot,q0] = initializeMicroscope();
 
-[x_origin,y_origin, z_origin] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
+[x_origin,y_origin, z_origin] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams)
 
 disp('Initialization Completed.');
 
 elapsed_initialized = toc; %Assign toc to initialization time
+
 %% Marker tracking and robot movement
 close all;
 
 %Initialize Arrays
-surgicalTip_3D = zeros(3,nFramesLeft);
-surgicalTip_3D_norm = zeros(3,nFramesLeft);
-deviation = zeros(3,nFramesLeft);
-Robot_Accuracy = zeros(3,nFramesLeft);
+surgicalTip_3D = zeros(3, nFramesLeft);
+surgicalTip_3D_norm = zeros(3, nFramesLeft);
+deviation = zeros(3, nFramesLeft);
+Robot_Accuracy = zeros(3, nFramesLeft);
 elapsed_1 = zeros(1, nFramesLeft);
 elapsed_2 = zeros(1, nFramesLeft);
 elapsed_3 = zeros(1, nFramesLeft);
 elapsed_4 = zeros(1, nFramesLeft);
-Q = zeros(1, nFramesLeft);
+Q = zeros(10, 6, nFramesLeft);
 
 %Initialize Video Player
 player = vision.DeployableVideoPlayer('Location',[10,100]);
@@ -112,7 +113,7 @@ tic;
 if size(centroidLeft) ~= [3 3] | size(centroidRight) ~= [3 3]
     warning(['Could not find marker(s) in frame: ', num2str(k)])
     surgicalTip_3D(:, k) = surgicalTip_3D(:, k-1);
-    surgicalTip_3D_norm(:, k) = surgicalTip_3D(:, k-1);
+    surgicalTip_3D_norm(:, k) = surgicalTip_3D_norm(:, k-1);
     elapsed_2(k) = toc; %End find tip timer
 else
     [point3d_1,point3d_2, point3d_3] = findWorldCoordinates(centroidLeft,centroidRight,stereoParams);
@@ -144,7 +145,7 @@ end
 %Start world2microscope timer
 tic;  
 
-%Find location in microscopecoordinates
+%Find location in microscope coordinates
 [xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D_norm(1, k), surgicalTip_3D_norm(2, k), surgicalTip_3D_norm(3, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
 
 %End world2microscope timer
@@ -154,7 +155,7 @@ elapsed_3(k) = toc;
 tic;
 
 %Initiate control system
-[q0,X,Y,Z,Q(k)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
+[q0,X,Y,Z,Q(:, :, k)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
 
 %End control system timer
 elapsed_4(k) = toc;
@@ -167,7 +168,16 @@ end
 release(player)
 close(v);  
 
-%% Compute joint s
+%% Joint stress testing
+
+%     Joint1(count*10 - 9:10*count,1) = Q(:,1);
+%     Joint2(count*10 - 9:10*count,1) = Q(:,2);
+%     Joint3(count*10 - 9:10*count,1) = Q(:,3);
+%     Joint4(count*10 - 9:10*count,1) = Q(:,4);
+%     Joint5(count*10 - 9:10*count,1) = Q(:,5);
+%     Joint6(count*10 - 9:10*count,1) = Q(:,6);
+
+plot(Q(1,1,:))
 
 %% Output performance metrics
 
