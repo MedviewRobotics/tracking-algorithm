@@ -1,6 +1,7 @@
 function [newq0,X,Y,Z,Q] = moveMicroscope(input_x,input_y,input_z,q0,AT03, k) %% change input arguments
 
 %while i<20
+
 R = 3.1416;
 P = 0;
 Y = 0;
