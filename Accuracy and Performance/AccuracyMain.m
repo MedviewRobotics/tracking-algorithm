@@ -21,11 +21,11 @@ load("stereoParamsAccuracy.mat");
 pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
 threshold = 245; % Threshold for Grayscale 
 
-readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
-readerRight = VideoReader('myRightTrialHoriz10cm.avi');
+%readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
+%readerRight = VideoReader('myRightTrialHoriz10cm.avi');
 
-% readerLeft = VideoReader('myLeftTrialVert5cm.avi');
-% readerRight = VideoReader('myRightTrialVert5cm.avi');
+readerLeft = VideoReader('myLeftTrialVert5cm.avi');
+readerRight = VideoReader('myRightTrialVert5cm.avi');
 
 % readerLeft = VideoReader('myLeftTrialDepth5cm.avi');
 % readerRight = VideoReader('myRightTrialDepth5cm.avi');
@@ -205,14 +205,9 @@ else
     
     [q0,X,Y,Z,Q] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot); %Send Coordinates to AT03 Robot
     elapsed_4(k) = toc;
-    %Store Q
+    
     count = count + 1;
-    Joint1(count*10 - 9:10*count,1) = Q(:,1);
-    Joint2(count*10 - 9:10*count,1) = Q(:,2);
-    Joint3(count*10 - 9:10*count,1) = Q(:,3);
-    Joint4(count*10 - 9:10*count,1) = Q(:,4);
-    Joint5(count*10 - 9:10*count,1) = Q(:,5);
-    Joint6(count*10 - 9:10*count,1) = Q(:,6);
+    %Store Q ... STILL TO DO
 
     Robot_Accuracy(1:3,k) = [X,Y,Z];
 end
@@ -226,6 +221,15 @@ end
 release(player)
 close(v);  
 
+%% Perform Joint Angle Analysis
+
+Joint1(count*10 - 9:10*count,1) = Q(:,1);
+Joint2(count*10 - 9:10*count,1) = Q(:,2);
+Joint3(count*10 - 9:10*count,1) = Q(:,3);
+Joint4(count*10 - 9:10*count,1) = Q(:,4);
+Joint5(count*10 - 9:10*count,1) = Q(:,5);
+Joint6(count*10 - 9:10*count,1) = Q(:,6);
+
 %% Output performance metrics
 
 [T, Equiv_FPS_Rate] = systemPerformance(elapsed_1,elapsed_2, elapsed_3, elapsed_4);
@@ -235,15 +239,15 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 
 %% Output Accuracy Metrics
 %Horizontal 100
-TAcc = trackingAccuracy(surgicalTip_Accuracy(1,:),100,Robot_Accuracy(2,:));
+TAcc = trackingAccuracy(surgicalTip_Accuracy(2,:),50,Robot_Accuracy(3,:));
 disp(TAcc);
 
 figure;
 subplot(211)
-plot(surgicalTip_Accuracy(1,:));
+plot(surgicalTip_Accuracy(2,:));
 title('Tracking System - Surgical Tip Location');
 subplot(212)
-plot(Robot_Accuracy(2,:));
+plot(Robot_Accuracy(3,:));
 title('Control System Forward Kinematics - End Effector Pose');
 xlabel('Frame #');
 

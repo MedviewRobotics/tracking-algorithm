@@ -3,9 +3,10 @@ function [newq0,X,Y,Z,Q] = moveMicroscope(input_x,input_y,input_z,q0,AT03) %% ch
 x = input_x; %new pose stream in
 y = input_y;%new pose _ stream in
 z = input_z; %new pose _ stream in
-R = 3.1416;
-P = 0;
-Y = 0;
+
+R = 3.1416; %Rad new pose
+P = 0; %Rad new pose
+Y = 0; %Rad new pose
 
 % Get q_new to move to new pose
 T_start = transl(x,y,z) * rpy2tr(R,P,Y);
