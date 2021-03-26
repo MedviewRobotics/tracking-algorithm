@@ -21,14 +21,17 @@ load("stereoParamsAccuracy.mat");
 pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
 threshold = 245; % Threshold for Grayscale 
 
-readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
-readerRight = VideoReader('myLeftTrialHoriz5cm.avi');
+readerLeft = VideoReader('myLeftTrialVert5cm.avi');
+readerRight = VideoReader('myLeftTrialVert5cm.avi');
 
 % readerLeft = VideoReader('myLeftTrialDepth5cm.avi');
 % readerRight = VideoReader('myRightTrialDepth5cm.avi');
 
-% readerLeft = VideoReader('myLeftTrialDepth5cm.avi');
-% readerRight = VideoReader('myRightTrialDepth5cm.avi');
+% readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
+% readerRight = VideoReader('myRightTrialHoriz5cm.avi');
+
+% readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
+% readerRight = VideoReader('myRightTrialHoriz10cm.avi');
 
 %Set up for skipping n frames
 nFramesLeft = readerLeft.NumFrames;
@@ -44,8 +47,8 @@ mov(1:nFramesLeft) = ...
            'colormap',[]);
 
 for k = 1:nFramesLeft
-mov(k).readerLeft = read(readerLeft,k);
-mov(k).readerRight = read(readerRight,k);
+	mov(k).readerLeft = read(readerLeft,k);
+	mov(k).readerRight = read(readerRight,k);
 end
 
 % Set blob analysis handling
@@ -57,25 +60,26 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ...
                                 'MaximumCount',3);
 
 [Robot,q0] = initializeMicroscope();
+
+[x_origin,y_origin, z_origin] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams)
+
 disp('Initialization Completed.');
 
 elapsed_initialized = toc; %Assign toc to initialization time
 
 %% Marker tracking and robot movement
 close all;
-clear surgicalTip_Accuracy;
-clear Robot_Accuracy;
 
 %Initialize Arrays
-surgicalTip_3D = zeros(3,235);
-surgicalTip_3D_norm = zeros(3,235);
-surgicalTip_3D_dev = zeros(3,235);
-deviation = zeros(3,235);
-Robot_Accuracy = zeros(3,235);
-elapsed_1 = zeros(1, 235);
-elapsed_2 = zeros(1, 235);
-elapsed_3 = zeros(1, 235);
-elapsed_4 = zeros(1, 235);
+surgicalTip_3D = zeros(3, nFramesLeft);
+surgicalTip_3D_norm = zeros(3, nFramesLeft);
+deviation = zeros(3, nFramesLeft);
+Robot_Accuracy = zeros(3, nFramesLeft);
+elapsed_1 = zeros(1, nFramesLeft);
+elapsed_2 = zeros(1, nFramesLeft);
+elapsed_3 = zeros(1, nFramesLeft);
+elapsed_4 = zeros(1, nFramesLeft);
+Q = zeros(1, nFramesLeft);
 
 %Initialize Video Player
 player = vision.DeployableVideoPlayer('Location',[10,100]);
@@ -109,14 +113,13 @@ tic;
 if size(centroidLeft) ~= [3 3] | size(centroidRight) ~= [3 3]
     warning(['Could not find marker(s) in frame: ', num2str(k)])
     surgicalTip_3D(:, k) = surgicalTip_3D(:, k-1);
-    surgicalTip_3D_norm(:, k) = surgicalTip_3D(:, k);
+    surgicalTip_3D_norm(:, k) = surgicalTip_3D_norm(:, k-1);
     elapsed_2(k) = toc; %End find tip timer
 else
     [point3d_1,point3d_2, point3d_3] = findWorldCoordinates(centroidLeft,centroidRight,stereoParams);
     [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(point3d_1,point3d_2,point3d_3,pivotOffset);
-    if k > 5
-        %add check for stdv
-        surgicalTip_3D_norm(:,k) = weightedAverage(surgicalTip_3D(:,:), k);
+    if k > 10
+        [surgicalTip_3D_norm(:,k)] = weightedAverage(surgicalTip_3D(:,:), k);
     end
     elapsed_2(k) = toc; %End find tip timer
     
@@ -143,62 +146,66 @@ end
 tic;  
 
 %Find location in microscopecoordinates
-[xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D_norm(1, k), surgicalTip_3D_norm(2, k), surgicalTip_3D_norm(3, k)); %World to Microscope Coordinate Mapping
+[xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D_norm(1, k), surgicalTip_3D_norm(2, k), surgicalTip_3D_norm(3, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
 
 %End world2microscope timer
 elapsed_3(k) = toc;
 
 %Start control system timer
-tic; 
+tic;
 
 %Initiate control system
-[xMicroscope, yMicroscope, zMicroscope] = safetyProtocols(xMicroscope, yMicroscope, zMicroscope); %Implementation of Safety Protocols
-[q0,X,Y,Z] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot); %Send Coordinates to AT03 Robot
+[q0,X,Y,Z,Q(k)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
 
 %End control system timer
 elapsed_4(k) = toc;
 
 %Log control system accuracy
 Robot_Accuracy(:,k) = [X,Y,Z];
+
 end
 
 release(player)
 close(v);  
 
+%% Joint stress testing
+
+%     Joint1(count*10 - 9:10*count,1) = Q(:,1);
+%     Joint2(count*10 - 9:10*count,1) = Q(:,2);
+%     Joint3(count*10 - 9:10*count,1) = Q(:,3);
+%     Joint4(count*10 - 9:10*count,1) = Q(:,4);
+%     Joint5(count*10 - 9:10*count,1) = Q(:,5);
+%     Joint6(count*10 - 9:10*count,1) = Q(:,6);
+
 %% Output performance metrics
 
 [T, Equiv_FPS_Rate] = systemPerformance(elapsed_1,elapsed_2, elapsed_3, elapsed_4);
-
 disp(T);
 fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 
 %% Output Accuracy Metrics
 %Vert 50
-TAcc = trackingAccuracy(surgicalTip_3D_norm(1,:),50,Robot_Accuracy(1,:))
+TAcc = trackingAccuracy(surgicalTip_3D_norm(2,:),50,Robot_Accuracy(2,:))
+disp(TAcc);
 
 figure;
 subplot(321)
-plot(surgicalTip_3D(1,6:235));
+plot(surgicalTip_3D(1,12:235));
 title('Surgical Tip Position X');
 subplot(322)
-plot(surgicalTip_3D_norm(1,6:235));
+plot(surgicalTip_3D_norm(1,12:235));
 title('Normalized Surgical Tip Position X');
 subplot(323)
-plot(surgicalTip_3D(2,6:235));
+plot(surgicalTip_3D(2,12:235));
 title('Surgical Tip Position Y');
 subplot(324)
-plot(surgicalTip_3D_norm(2,6:235));
+plot(surgicalTip_3D_norm(2,12:235));
 title('Normalized Surgical Tip Position Y');
 subplot(325)
-plot(surgicalTip_3D(3,6:235));
+plot(surgicalTip_3D(3,12:235));
 title('Surgical Tip Position Z');
 subplot(326)
-plot(surgicalTip_3D_norm(3,6:235));
+plot(surgicalTip_3D_norm(3,12:235));
 title('Normalized Surgical Tip Position Z');
-
-
-disp(TAcc);
-
-
 
 

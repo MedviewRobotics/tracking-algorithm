@@ -1,12 +1,11 @@
 function [x_output, y_output, z_output] = world2Microscope_Accuracy(x_input, y_input, z_input)
 
-x_world_to_local = -420;
-y_world_to_local = -160;
-z_world_to_local = 1750;
+x_world_to_local = x_origin;
+y_world_to_local = y_origin;
+z_world_to_local = z_origin;
 lclCoord = global2localcoord([x_input;y_input;z_input],'rr',[x_world_to_local;...
     y_world_to_local; z_world_to_local]);
 
-%%
 y_output = lclCoord(1); %X from Tracking
 
 x_output = lclCoord(3); %Z from Tracking Output
