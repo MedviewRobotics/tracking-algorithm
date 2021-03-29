@@ -1,6 +1,22 @@
+%TRACKINGACCURACY computes metrics on the overall system accuracy
+%
+%   T = trackingAccuracy(tracked_values,actual_displacement,robot_values)
+%   computes metrics on the overall system accuracy of the automated
+%   robotic microscopy system.
+%
+%   INPUTS:
+%       tracked_values = 1xnFramesLeft array that contains the surgical tip
+%           coordinates computed by the tracking system over all frames
+%       actual_displacement = GT value indicating the movement in the
+%           specified direction in the video
+%       robot_values = 1xnFramesLeft array that documents the movement of
+%           the robot across all frames in response to tracked_values inputs
+%
+%   OUTPUTS:
+%       T = tabulated accuracy of the overall system, the tracking system,
+%           and the control system
+
 function T = trackingAccuracy(tracked_values,actual_displacement,robot_values)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
 
 Process_Names = ["Tracking Accuracy"; "Robotic Control Sys Accuracy";"End-to-End Accuracy"];
 measured_displacement = zeros(3, 1);
