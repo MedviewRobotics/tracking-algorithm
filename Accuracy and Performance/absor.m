@@ -1,3 +1,15 @@
+%ABSOR is a tool for finding the rotation matrix.
+%
+%   reg=ABSOR(A,B,'doTrans',0) returns the rotation matrix for the surgical
+%   instrument tip. 
+%
+%   INPUTS:
+%       A: is the orthogonal matrix of two vectors on the plane, 3x3 matrix
+%       B: is an identity matrix, 2x3 matrix.
+%
+%   OUTPUTS:
+%       reg: rotation matrix of the surgical instrument, 3x3 matrix
+
 function [regParams,Bfit,ErrorStats]=absor(A,B,varargin)
 %ABSOR is a tool for finding the rotation -- and optionally also the
 %scaling and translation -- that best maps one collection of point coordinates to 

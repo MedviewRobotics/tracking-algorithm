@@ -1,3 +1,24 @@
+%FINDSURGICALTIP determines the location and orientation of the surgical
+%instrument.
+%
+%   [surgicalTip_3D, rotMatrix] = FINDSURGICALTIP(green_3D,blue_3D,red_3D, pivotOffset)
+%   returns the position of the surgical tip and the orientation of the 
+%   surgical instrument 3 x 3 Matrix
+%
+%   INPUTS:
+%       green_3D = 3D location of the green marker in world coordinates, 3x1 matrix
+%       blue_3D = 3D location of the blue marker in world coordinates, 3x1 matrix
+%       red_3D = 3D location of the red marker in world coordinates, 3x1 matrix
+%       pivotOffset = distance from the midpoint of the blue and green
+%           markers to the tip of the instrument, double value
+%
+%   OUTPUTS:
+%       surgicalTip_3D = 3D position of the surgical tip in world
+%           coordinates
+%       rotMatrix = rotation matrix describing the orientation of the
+%           surgical tip, 3x3 matrix
+
+
 function [surgicalTip_3D, rotMatrix] = findSurgicalTip(green_3D,blue_3D,red_3D, pivotOffset)
 
 %Determine point X between blue and green marker (37.5 mm away from green)

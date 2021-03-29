@@ -1,5 +1,31 @@
-function [newq0,X,Y,Z,Q] = moveMicroscope(input_x,input_y,input_z,q0,AT03) %% change input arguments
+%MOVEMICROSCOPE initiates control system to move robot
+%
+%   [newq0,X,Y,Z,Q] = moveMicroscope(input_x,input_y,input_z,q0,AT03)
+%   initiates movement of the robot in response to new surgical tip
+%   coordinates from the tracking system.
+%
+%   INPUTS:
+%       input_x = new X coordinates of the surgical tip in local
+%           coordinates, stored in 1x3 array.
+%       input_y = new Y coordinates of the surgical tip in local
+%           coordinates, stored in 1x3 array.
+%       input_z = new Z coordinates of the surgical tip in local
+%           coordinates, stored in 1x3 array.
+%       q0 = previous robot location, stored in 1x6 array
+%       AT03 = robot unique identifier
+%
+%   OUPUTS:
+%       newq0 = output robot location, required as an input in the
+%           following initiation
+%       X = ?
+%       Y = ?
+%       Z = ?
 
+function [newq0,X,Y,Z,Q] = moveMicroscope(input_x,input_y,input_z,q0,AT03)
+
+%while i<20
+
+<<<<<<< HEAD
 x = input_x; %new pose stream in
 y = input_y;%new pose _ stream in
 z = input_z; %new pose _ stream in
@@ -7,6 +33,14 @@ z = input_z; %new pose _ stream in
 R = 3.1416; %Rad new pose
 P = 0; %Rad new pose
 Y = 0; %Rad new pose
+=======
+R = 3.1416;
+P = 0;
+Y = 0;
+>>>>>>> main
+
+%Call safety protocol function
+[x, y, z] = safetyProtocols(input_x, input_y, input_z); 
 
 % Get q_new to move to new pose
 T_start = transl(x,y,z) * rpy2tr(R,P,Y);
