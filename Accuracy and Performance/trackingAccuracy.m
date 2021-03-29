@@ -23,7 +23,7 @@ measured_displacement = zeros(3, 1);
 accuracy = zeros(3, 1);
 
 tracked_values(tracked_values == 0) = NaN; %Setting Skipped Frames 0 Output value to NaN
-tracked_displacement = abs(mean(tracked_values(1:50),'omitnan') - mean(tracked_values(200:231),'omitnan')); %How much tracker Moved
+tracked_displacement = abs(mean(tracked_values(6:50),'omitnan') - mean(tracked_values(200:231),'omitnan')); %How much tracker Moved
 track_accuracy = 100 - abs((tracked_displacement-actual_displacement)./actual_displacement)*100; %Error Percentage
 
 robot_values(robot_values == 0) = NaN; %Setting Skipped Frames 0 Output value to NaN
