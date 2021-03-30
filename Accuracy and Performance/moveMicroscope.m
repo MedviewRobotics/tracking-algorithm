@@ -30,7 +30,7 @@ P = 0;
 Y = 0;
 
 %Call safety protocol function
-[x, y, z] = safetyProtocols(input_x, input_y, input_z); 
+[x, y, z] = safetyprotocols(input_x, input_y, input_z); 
 
 % Get q_new to move to new pose
 T_start = transl(x,y,z) * rpy2tr(R,P,Y);
@@ -50,4 +50,3 @@ T_start = AT03.fkine(q0);
 newq0 = q0;
 
 end
-

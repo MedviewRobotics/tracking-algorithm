@@ -1,0 +1,24 @@
+function T = trackingAccuracy(tracked_values,actual_displacement,robot_values)
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+
+Process_Names = ["Tracking Accuracy"; "Robotic Control Sys Accuracy";"End-to-End Accuracy"];
+table_displacement = zeros(3, 1);
+accuracy = zeros(3, 1);
+
+
+tracked_values(tracked_values == 0) = NaN; %Setting Skipped Frames 0 Output value to NaN
+tracked_displacement = abs(mean(tracked_values(1:50),'omitnan') - mean(tracked_values(200:231),'omitnan')); %How much tracker Moved
+track_accuracy = 100 - abs((tracked_displacement-actual_displacement)./actual_displacement)*100; %Error Percentage
+
+robot_values(robot_values == 0) = NaN; %Setting Skipped Frames 0 Output value to NaN
+robot_displacement = abs(mean(robot_values(1:50),'omitnan') - mean(robot_values(200:231),'omitnan')); %How much tracker Moved
+robot_accuracy = 100 - abs((robot_displacement-actual_displacement)./actual_displacement)*100; %Error Percentage
+
+
+tracked_displacement(1,1) = tracked_displacement;
+
+T = table(Process_Names, tracked_displacement, accuracy);
+
+end
+

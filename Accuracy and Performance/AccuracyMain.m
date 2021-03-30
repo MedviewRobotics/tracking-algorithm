@@ -33,7 +33,6 @@ readerRight = VideoReader('myLeftTrialVert5cm.avi');
 
 % readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
 % readerRight = VideoReader('myRightTrialHoriz10cm.avi');
-
 %Set up for skipping n frames
 nFramesLeft = readerLeft.NumFrames;
 vidHeightLeft = readerLeft.Height;
@@ -81,7 +80,6 @@ elapsed_2 = zeros(1, nFramesLeft);
 elapsed_3 = zeros(1, nFramesLeft);
 elapsed_4 = zeros(1, nFramesLeft);
 Q = zeros(10, 6, nFramesLeft);
-
 
 %Initialize Video Player
 player = vision.DeployableVideoPlayer('Location',[10,100]);
@@ -193,6 +191,26 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 TAcc = trackingAccuracy(surgicalTip_3D_norm(2,:),50,Robot_Accuracy(3,:))
 disp(TAcc);
 
+
+figure;
+subplot(321)
+plot(surgicalTip_3D(1,12:235));
+title('Surgical Tip Position X');
+subplot(322)
+plot(surgicalTip_3D_norm(1,12:235));
+title('Normalized Surgical Tip Position X');
+subplot(323)
+plot(surgicalTip_3D(2,12:235));
+title('Surgical Tip Position Y');
+subplot(324)
+plot(surgicalTip_3D_norm(2,12:235));
+title('Normalized Surgical Tip Position Y');
+subplot(325)
+plot(surgicalTip_3D(3,12:235));
+title('Surgical Tip Position Z');
+subplot(326)
+plot(surgicalTip_3D_norm(3,12:235));
+title('Normalized Surgical Tip Position Z');
 
 figure;
 subplot(321)
