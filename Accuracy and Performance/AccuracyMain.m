@@ -6,7 +6,7 @@
 % Author #1: Ginette Hartell - 500755250
 % Author #2: Mohammad Aziz Uddin - 500754765
 % Author #3: Jay Tailor - 500750496
-% Author #4: Claudia Alonzo - 
+% Author #4: Claudia Alonzo - 500745327
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Initialize Peter Corke's Toolbox 
 petercorkeinitialize();
