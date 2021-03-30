@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 %SAFETYPROTOCOLS implements safety protocols to limit the movement of
 %robot.
 %
@@ -27,11 +26,6 @@
 %           meet the safety requirements of the robot.
 
 function [xMicroscope, yMicroscope, zMicroscope] = safetyProtocols(xMicroscope_In, yMicroscope_In, zMicroscope_In)
-=======
-function [xMicroscope, yMicroscope, zMicroscope] = safetyprotocols(xMicroscope_In, yMicroscope_In, zMicroscope_In)
-%SAFETYPROTOCOLS Summary of this function goes here
-%   Detailed explanation goes here
->>>>>>> parent of 2c3515b (averaging frames)
 
 %Z from Tracking Output
 if xMicroscope_In<35
@@ -61,4 +55,3 @@ else
 end
 
 end
-
