@@ -89,11 +89,8 @@ v = VideoWriter('accuracy.avi');
 v.FrameRate = 30;
 open(v)
 
-%%IMPORTANT%%
-%Are you running this video for the first time (1 = Yes, 0 = No)
-Origin_needed = 0;
-
 frames_skip = 1;
+
 for k = 1:frames_skip:nFramesLeft
 tic %Starts pre-processing timer
 
