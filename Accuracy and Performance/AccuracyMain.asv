@@ -80,8 +80,8 @@ elapsed_2 = zeros(1, nFramesLeft);
 elapsed_3 = zeros(1, nFramesLeft);
 elapsed_4 = zeros(1, nFramesLeft);
 count = 1;
-%Q = zeros(10, 6, nFramesLeft);
-Q = zeros(10*nFramesLeft, 6);
+Q = zeros(10, 6, nFramesLeft);
+Q_Test = zeros(10*nFramesLeft, 6);
 
 %Initialize Video Player
 player = vision.DeployableVideoPlayer('Location',[10,100]);
@@ -161,7 +161,7 @@ tic;
 
 %Initiate control system
 %[q0,X,Y,Z,Q(:, :, k)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
-[q0,X,Y,Z,Q(count*10 - 9:count*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
+[q0,X,Y,Z,Q_Test(count*10 - nFramesLeft:count*nFramesLeft, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
 count = count + 1;
 
 %End control system timer
