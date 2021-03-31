@@ -28,8 +28,8 @@ readerRight = VideoReader('myLeftTrialVert5cm.avi');
 % readerLeft = VideoReader('myLeftTrialDepth5cm.avi');
 % readerRight = VideoReader('myRightTrialDepth5cm.avi');
 
-% readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
-% readerRight = VideoReader('myRightTrialHoriz5cm.avi');
+%readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
+%readerRight = VideoReader('myRightTrialHoriz5cm.avi');
 
 % readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
 % readerRight = VideoReader('myRightTrialHoriz10cm.avi');
@@ -148,7 +148,7 @@ end
 tic;  
 
 %Find location in microscope coordinates
-[xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D_norm(1, k), surgicalTip_3D_norm(2, k), surgicalTip_3D_norm(3, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
+[xMicroscope, yMicroscope, zMicroscope, test] = world2Microscope_Accuracy(surgicalTip_3D_norm(1, k), surgicalTip_3D_norm(2, k), surgicalTip_3D_norm(3, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
 
 %End world2microscope timer
 elapsed_3(k) = toc;
@@ -189,29 +189,38 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 
 %% Output Accuracy Metrics
 %Vert 50
-TAcc = trackingAccuracy(surgicalTip_3D_norm(2,:),50,Robot_Accuracy(3,:))
+TAcc = trackingAccuracy(surgicalTip_3D_norm(1,:),50,Robot_Accuracy(2,:))
 disp(TAcc);
 
 
 figure;
-subplot(321)
+subplot(331)
 plot(surgicalTip_3D(1,12:235));
 title('Surgical Tip Position X');
-subplot(322)
+subplot(332)
 plot(surgicalTip_3D_norm(1,12:235));
 title('Normalized Surgical Tip Position X');
-subplot(323)
+subplot(333)
+plot(Robot_Accuracy(2,12:235));
+title('Robot Effector Tip Position Y (Tracking X)');
+subplot(334)
 plot(surgicalTip_3D(2,12:235));
 title('Surgical Tip Position Y');
-subplot(324)
+subplot(335)
 plot(surgicalTip_3D_norm(2,12:235));
 title('Normalized Surgical Tip Position Y');
-subplot(325)
+subplot(336)
+plot(Robot_Accuracy(3,12:235));
+title('Robot Effector Tip Position Z (Tracking Y)');
+subplot(337)
 plot(surgicalTip_3D(3,12:235));
 title('Surgical Tip Position Z');
-subplot(326)
+subplot(338)
 plot(surgicalTip_3D_norm(3,12:235));
 title('Normalized Surgical Tip Position Z');
+subplot(339)
+plot(Robot_Accuracy(1,12:235));
+title('Normalized Surgical Tip Position X (Tracking Z)');
 
 figure;
 subplot(321)

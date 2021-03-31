@@ -2,6 +2,7 @@ function [x_origin,y_origin, z_origin] = findOrigin(mov,nFramesLeft,threshold,hb
 
 surgicalTip_3D = zeros(3,nFramesLeft);
 surgicalTip_3D_norm = zeros(3,nFramesLeft);
+temp = 0;
 
 frames_skip = 1;
 
@@ -31,9 +32,11 @@ for k = 1:frames_skip:nFramesLeft
     end
 end
 
-x_origin = mean(surgicalTip_3D_norm(1, 10:nFramesLeft));
-y_origin = mean(min(surgicalTip_3D_norm(2, 10:50),min(surgicalTip_3D_norm(2, 50:100)))) - 100;
-z_origin = 1750;
+x_origin = mean(surgicalTip_3D_norm(1, 15:nFramesLeft));
+temp = -mean(max(surgicalTip_3D_norm(2, 15:220))); %,max(surgicalTip_3D_norm(2, 50:100))));
+y_origin = temp - 100;
+z_origin = mean(surgicalTip_3D_norm(3, 15:nFramesLeft)) - 75; %75 is the center depth/works with robot/for back and forth
+
 
 end
 

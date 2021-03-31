@@ -24,12 +24,13 @@
 %       z_output = z coordinate of the surgical instrument in local
 %           coordinates
 
-function [x_output, y_output, z_output] = world2Microscope_Accuracy(x_input, y_input, z_input,x_origin,y_origin,z_origin)
+function [x_output, y_output, z_output,z_world_to_local] = world2Microscope_Accuracy(x_input, y_input, z_input,x_origin,y_origin,z_origin)
 
 x_world_to_local = x_origin;
 y_world_to_local = y_origin;
 z_world_to_local = z_origin;
-lclCoord = global2localcoord([x_input;y_input;z_input],'rr',[x_world_to_local;...
+
+lclCoord = global2localcoord([x_input;-y_input;z_input],'rr',[x_world_to_local;...
     y_world_to_local; z_world_to_local]);
 
 y_output = lclCoord(1); %X from Tracking
