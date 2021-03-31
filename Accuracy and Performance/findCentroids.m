@@ -41,12 +41,12 @@ img_right = imdilate(img_right,strel('disk',6));
 %Find features of the blobs and filter out any that don't meet criteria
 cc_left = bwconncomp(img_left);
 stats_left = regionprops(cc_left,'Area','Centroid','BoundingBox','Eccentricity','Circularity','Extent','EquivDiameter'); 
-idx_left = find([stats_left.Area] > 165 & [stats_left.Area] < 550 & [stats_left.Eccentricity] > 0.1 & [stats_left.Eccentricity] < 0.67);% & ...
+idx_left = find([stats_left.Area] > 150 & [stats_left.Area] < 550 & [stats_left.Eccentricity] > 0.1 & [stats_left.Eccentricity] < 0.67);% & ...
 BW2_left = ismember(labelmatrix(cc_left),idx_left);  
 
 cc_right = bwconncomp(img_right);
 stats_right = regionprops(cc_right,'Area','Centroid','BoundingBox','Eccentricity','Circularity','Extent','EquivDiameter'); 
-idx_right = find([stats_right.Area] > 165 & [stats_right.Area] < 550 & [stats_right.Eccentricity] > 0.1 & [stats_right.Eccentricity] < 0.67);% & ...
+idx_right = find([stats_right.Area] > 150 & [stats_right.Area] < 550 & [stats_right.Eccentricity] > 0.1 & [stats_right.Eccentricity] < 0.67);% & ...
 BW2_right = ismember(labelmatrix(cc_right),idx_right);  
 
 %Find Centroid and Bounding Box of each marker
