@@ -46,10 +46,10 @@ else
 end
 
 %Y from Tracking Output
-if zMicroscope_In<100
-     zMicroscope = 100;
-elseif zMicroscope_In>170
-     zMicroscope = 170;
+if zMicroscope_In<90
+     zMicroscope = 90;
+elseif zMicroscope_In>180
+     zMicroscope = 180;
 else
      zMicroscope = zMicroscope_In;
 end
