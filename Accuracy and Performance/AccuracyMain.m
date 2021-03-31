@@ -23,7 +23,7 @@ pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
 threshold = 245; % Threshold for Grayscale 
 
 readerLeft = VideoReader('myLeftTrialVert5cm.avi');
-readerRight = VideoReader('myRightTrialVert5cm.avi');
+readerRight = VideoReader('myLeftTrialVert5cm.avi');
 
 % readerLeft = VideoReader('myLeftTrialDepth5cm.avi');
 % readerRight = VideoReader('myRightTrialDepth5cm.avi');
@@ -142,7 +142,7 @@ else
         ' Y: ' num2str(round(point3d_3(1,2)),'%d') ' Z: ' num2str(round(point3d_3(1,3)))],'FontSize',18);
     
     rotMatrix;
-    eul = rotm2eul(rotMatrix);
+    eul = rotm2eul(rotMatrix)
     player(rgb);
     writeVideo(v,rgb);
 end
