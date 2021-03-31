@@ -22,11 +22,14 @@ load("stereoParamsAccuracy.mat");
 pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
 threshold = 245; % Threshold for Grayscale 
 
-readerLeft = VideoReader('myLeftTrialVert5cm.avi');
-readerRight = VideoReader('myRightTrialVert5cm.avi');
+% readerLeft = VideoReader('myLeftTrialVert5cm.avi');
+% readerRight = VideoReader('myRightTrialVert5cm.avi');
 
-% readerLeft = VideoReader('myLeftTrialDepth5cm.avi');
-% readerRight = VideoReader('myRightTrialDepth5cm.avi');
+% readerLeft = VideoReader('myLeftTrialVert5cm.avi');
+% readerRight = VideoReader('myRightTrialVert5cm.avi');
+
+readerLeft = VideoReader('myLeftTrialNormal8.avi');
+readerRight = VideoReader('myRightTrialNormal8.avi');
 
 %readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
 %readerRight = VideoReader('myRightTrialHoriz5cm.avi');
@@ -69,7 +72,7 @@ disp('Initialization Completed.');
 elapsed_initialized = toc; %Assign toc to initialization time
 
 %% Marker tracking and robot movement
-close all;
+%close all;
 
 %Initialize Arrays
 surgicalTip_3D = zeros(3, nFramesLeft);
@@ -151,7 +154,7 @@ end
 tic;  
 
 %Find location in microscope coordinates
-[xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D_norm(1, k), surgicalTip_3D_norm(2, k), surgicalTip_3D_norm(3, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
+%[xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D_norm(1, k), surgicalTip_3D_norm(2, k), surgicalTip_3D_norm(3, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
 
 %End world2microscope timer
 elapsed_3(k) = toc;
@@ -160,14 +163,14 @@ elapsed_3(k) = toc;
 tic;
 
 %Initiate control system
-[q0,X,Y,Z,Q(count*10 - 9:count*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul);
-count = count + 1;
+%[q0,X,Y,Z,Q(count*10 - 9:count*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul);
+%count = count + 1;
 
 %End control system timer
 elapsed_4(k) = toc;
 
 %Log control system accuracy
-Robot_Accuracy(:,k) = [X,Y,Z];
+%Robot_Accuracy(:,k) = [X,Y,Z];
 end
 
 release(player)
@@ -194,7 +197,7 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 TAcc = trackingAccuracy(surgicalTip_3D_norm(2,:),50,Robot_Accuracy(3,:))
 disp(TAcc);
 
-figure;
+figure (2);
 subplot(331)
 plot(surgicalTip_3D(1,12:235));
 title('Surgical Tip Position X');
