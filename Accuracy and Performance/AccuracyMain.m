@@ -154,7 +154,7 @@ end
 tic;  
 
 %Find location in microscope coordinates
-%[xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D_norm(1, k), surgicalTip_3D_norm(2, k), surgicalTip_3D_norm(3, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
+[xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D_norm(1, k), surgicalTip_3D_norm(2, k), surgicalTip_3D_norm(3, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
 
 %End world2microscope timer
 elapsed_3(k) = toc;
@@ -163,14 +163,14 @@ elapsed_3(k) = toc;
 tic;
 
 %Initiate control system
-%[q0,X,Y,Z,Q(count*10 - 9:count*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul);
-%count = count + 1;
+[q0,X,Y,Z,Q(count*10 - 9:count*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul);
+count = count + 1;
 
 %End control system timer
 elapsed_4(k) = toc;
 
 %Log control system accuracy
-%Robot_Accuracy(:,k) = [X,Y,Z];
+Robot_Accuracy(:,k) = [X,Y,Z];
 end
 
 release(player)
