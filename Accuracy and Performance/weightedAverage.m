@@ -31,9 +31,9 @@ W4 = [0.15  0.25  0.25  0.35];
 recent_values = [surgicalTip_3D(:, k-9) surgicalTip_3D(:, k-8) surgicalTip_3D(:, k-7) surgicalTip_3D(:, k-6) surgicalTip_3D(:, k-5)  surgicalTip_3D(:, k-4)  surgicalTip_3D(:, k-3)  surgicalTip_3D(:, k-2)  surgicalTip_3D(:, k-1)  surgicalTip_3D(:, k)];
 
 %Remove outliers
-remove_outliers_x = rmoutliers(recent_values(1, :));
-remove_outliers_y = rmoutliers(recent_values(2, :));
-remove_outliers_z = rmoutliers(recent_values(3, :));
+remove_outliers_x = rmoutliers(recent_values(1, :), 'mean');
+remove_outliers_y = rmoutliers(recent_values(2, :), 'mean');
+remove_outliers_z = rmoutliers(recent_values(3, :), 'mean');
 
 %Apply weights X
 if size(remove_outliers_x) == [1 10]
