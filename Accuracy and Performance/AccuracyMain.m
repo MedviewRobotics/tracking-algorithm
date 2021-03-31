@@ -23,7 +23,7 @@ pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
 threshold = 245; % Threshold for Grayscale 
 
 readerLeft = VideoReader('myLeftTrialVert5cm.avi');
-readerRight = VideoReader('myLeftTrialVert5cm.avi');
+readerRight = VideoReader('myRightTrialVert5cm.avi');
 
 % readerLeft = VideoReader('myLeftTrialDepth5cm.avi');
 % readerRight = VideoReader('myRightTrialDepth5cm.avi');
@@ -33,6 +33,7 @@ readerRight = VideoReader('myLeftTrialVert5cm.avi');
 
 % readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
 % readerRight = VideoReader('myRightTrialHoriz10cm.avi');
+
 %Set up for skipping n frames
 nFramesLeft = readerLeft.NumFrames;
 vidHeightLeft = readerLeft.Height;
@@ -140,6 +141,8 @@ else
     rgb = insertText(rgb,centroidLeft(3,:) - 50,['X: ' num2str(round(point3d_3(1,1)),'%d')...
         ' Y: ' num2str(round(point3d_3(1,2)),'%d') ' Z: ' num2str(round(point3d_3(1,3)))],'FontSize',18);
     
+    rotMatrix;
+    eul = rotm2eul(rotMatrix);
     player(rgb);
     writeVideo(v,rgb);
 end
@@ -148,7 +151,7 @@ end
 tic;  
 
 %Find location in microscope coordinates
-[xMicroscope, yMicroscope, zMicroscope, test] = world2Microscope_Accuracy(surgicalTip_3D_norm(1, k), surgicalTip_3D_norm(2, k), surgicalTip_3D_norm(3, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
+[xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D_norm(1, k), surgicalTip_3D_norm(2, k), surgicalTip_3D_norm(3, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
 
 %End world2microscope timer
 elapsed_3(k) = toc;
@@ -157,8 +160,7 @@ elapsed_3(k) = toc;
 tic;
 
 %Initiate control system
-%[q0,X,Y,Z,Q(:, :, k)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
-[q0,X,Y,Z,Q(count*10 - 9:count*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot);
+[q0,X,Y,Z,Q(count*10 - 9:count*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul);
 count = count + 1;
 
 %End control system timer
@@ -189,9 +191,8 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 
 %% Output Accuracy Metrics
 %Vert 50
-TAcc = trackingAccuracy(surgicalTip_3D_norm(1,:),50,Robot_Accuracy(2,:))
+TAcc = trackingAccuracy(surgicalTip_3D_norm(2,:),50,Robot_Accuracy(3,:))
 disp(TAcc);
-
 
 figure;
 subplot(331)
@@ -221,23 +222,3 @@ title('Normalized Surgical Tip Position Z');
 subplot(339)
 plot(Robot_Accuracy(1,12:235));
 title('Normalized Surgical Tip Position X (Tracking Z)');
-
-figure;
-subplot(321)
-plot(surgicalTip_3D(1,12:235));
-title('Surgical Tip Position X');
-subplot(322)
-plot(surgicalTip_3D_norm(1,12:235));
-title('Normalized Surgical Tip Position X');
-subplot(323)
-plot(surgicalTip_3D(2,12:235));
-title('Surgical Tip Position Y');
-subplot(324)
-plot(surgicalTip_3D_norm(2,12:235));
-title('Normalized Surgical Tip Position Y');
-subplot(325)
-plot(surgicalTip_3D(3,12:235));
-title('Surgical Tip Position Z');
-subplot(326)
-plot(surgicalTip_3D_norm(3,12:235));
-title('Normalized Surgical Tip Position Z');
