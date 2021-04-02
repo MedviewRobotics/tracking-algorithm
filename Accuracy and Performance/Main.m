@@ -133,7 +133,7 @@ for k = 1:frames_skip:nFramesLeft
     
     %Validate position of centroids
     if size(centroidLeft) ~= [3 3] | size(centroidRight) ~= [3 3]
-        warning(['Could not find marker(s) in frame: ', num2str(k)])
+        warning(['Could not detect marker(s) in frame: ', num2str(k), ', using predicted locations'])
         point3d_1(:,k) = point3d_1(:,k-1);
         point3d_2(:,k) = point3d_2(:,k-1);
         point3d_3(:,k) = point3d_3(:,k-1);
@@ -141,6 +141,9 @@ for k = 1:frames_skip:nFramesLeft
         trackedLocation_2(:,k) = trackedLocation_2(:,k-1);
         trackedLocation_3(:,k) = trackedLocation_3(:,k-1);
         [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
+%         trackedLocation_1(:,k) = predict(kalmanFilter_1);
+%         trackedLocation_2(:,k) = predict(kalmanFilter_2);
+%         trackedLocation_3(:,k) = predict(kalmanFilter_3);
         elapsed_2(k) = toc; %End find tip timer
     else
         [point3d_1(:,k),point3d_2(:,k), point3d_3(:,k)] = findWorldCoordinates(centroidLeft,centroidRight,stereoParams);
@@ -194,7 +197,7 @@ for k = 1:frames_skip:nFramesLeft
     tic;
     
     %Initiate control system
-    [q0,X,Y,Z,Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul);
+    [q0,X,Y,Z,Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul, k);
     
     %End control system timer
     elapsed_4(k) = toc;
@@ -227,36 +230,27 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 TAcc = trackingAccuracy(surgicalTip_3D(2,:),50,Robot_Accuracy(3,:))
 disp(TAcc);
 
-% figure (2);
-% subplot(331)
-% plot(surgicalTip_3D(1,12:235));
-% title('Surgical Tip Position X');
-% subplot(332)
-% plot(surgicalTip_3D_norm(1,12:235));
-% title('Normalized Surgical Tip Position X');
-% subplot(333)
-% plot(Robot_Accuracy(2,12:235));
-% title('Robot Effector Tip Position Y (Tracking X)');
-% subplot(334)
-% plot(surgicalTip_3D(2,12:235));
-% title('Surgical Tip Position Y');
-% subplot(335)
-% plot(surgicalTip_3D_norm(2,12:235));
-% title('Normalized Surgical Tip Position Y');
-% subplot(336)
-% plot(Robot_Accuracy(3,12:235));
-% title('Robot Effector Tip Position Z (Tracking Y)');
-% subplot(337)
-% plot(surgicalTip_3D(3,12:235));
-% title('Surgical Tip Position Z');
-% subplot(338)
-% plot(surgicalTip_3D_norm(3,12:235));
-% title('Normalized Surgical Tip Position Z');
-% subplot(339)
-% plot(Robot_Accuracy(1,12:235));
-% title('Normalized Surgical Tip Position X (Tracking Z)');
+figure;
+subplot(321)
+plot(surgicalTip_3D(1,lower:upper));
+title('Surgical Tip Position X');
+subplot(322)
+plot(Robot_Accuracy(2,lower:upper));
+title('Robot Effector Tip Position Y (Tracking X)');
+subplot(323)
+plot(surgicalTip_3D(2,lower:upper));
+title('Surgical Tip Position Y');
+subplot(324)
+plot(Robot_Accuracy(3,lower:upper));
+title('Robot Effector Tip Position Z (Tracking Y)');
+subplot(325)
+plot(surgicalTip_3D(3,lower:upper));
+title('Surgical Tip Position Z');
+subplot(326)
+plot(Robot_Accuracy(1,lower:upper));
+title('Normalized Surgical Tip Position X (Tracking Z)');
 
-lower = 5;
+lower = 1;
 upper = 235;
 
 figure
