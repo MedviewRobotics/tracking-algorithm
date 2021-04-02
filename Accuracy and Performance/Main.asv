@@ -96,6 +96,9 @@ MotionNoise = [25, 10];
 % initialEstimateError = [1 1 1]*1e5;
 % MotionNoise = [25, 10, 10];
 measurementNoise = 10;
+movement_1 = 1;
+movement_2 = 37;
+movement_3 = 81;
 
 disp('Initialization Completed.');
 
@@ -133,26 +136,34 @@ for k = 1:frames_skip:nFramesLeft
     
     %Validate position of centroids
     if size(centroidLeft) ~= [3 3] | size(centroidRight) ~= [3 3]
-        warning(['Could not find marker(s) in frame: ', num2str(k)])
+        warning(['Could not detect marker(s) in frame: ', num2str(k), ', using predicted locations'])
         point3d_1(:,k) = point3d_1(:,k-1);
         point3d_2(:,k) = point3d_2(:,k-1);
         point3d_3(:,k) = point3d_3(:,k-1);
         trackedLocation_1(:,k) = trackedLocation_1(:,k-1);
         trackedLocation_2(:,k) = trackedLocation_2(:,k-1);
         trackedLocation_3(:,k) = trackedLocation_3(:,k-1);
+%         trackedLocation_1(:,k) = predict(kalmanFilter_1);
+%         trackedLocation_2(:,k) = predict(kalmanFilter_2);
+%         trackedLocation_3(:,k) = predict(kalmanFilter_3);
         [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
         elapsed_2(k) = toc; %End find tip timer
     else
         [point3d_1(:,k),point3d_2(:,k), point3d_3(:,k)] = findWorldCoordinates(centroidLeft,centroidRight,stereoParams);
-        if isTrackInitialized == 0
+        if k == movement_1 | k == movement_2 | k == movement_3
+            if k == movement_1
+                surgicalTip_3D(:, k) = findSurgicalTip(point3d_1(:,k),point3d_2(:,k),point3d_3(:,k),pivotOffset);
+            else 
+                surgicalTip_3D(:, k) = surgicalTip_3D(:, k-1);
+            end
             kalmanFilter_1 = configureKalmanFilter('ConstantVelocity',...
                 point3d_1(:,k), initialEstimateError, MotionNoise,measurementNoise);
             kalmanFilter_2 = configureKalmanFilter('ConstantVelocity',...
                 point3d_2(:,k), initialEstimateError, MotionNoise,measurementNoise);
             kalmanFilter_3 = configureKalmanFilter('ConstantVelocity',...
                 point3d_3(:,k), initialEstimateError, MotionNoise,measurementNoise);
-            isTrackInitialized = 1;
-            [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(point3d_1(:,k),point3d_2(:,k),point3d_3(:,k),pivotOffset);
+        elseif 
+        
         else
             trackedLocation_1(:,k) = correct(kalmanFilter_1, point3d_1(:,k));
             trackedLocation_2(:,k) = correct(kalmanFilter_2, point3d_2(:,k));
@@ -194,7 +205,7 @@ for k = 1:frames_skip:nFramesLeft
     tic;
     
     %Initiate control system
-    [q0,X,Y,Z,Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul);
+    [q0,X,Y,Z,Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul, k);
     
     %End control system timer
     elapsed_4(k) = toc;
@@ -227,37 +238,29 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 TAcc = trackingAccuracy(surgicalTip_3D(2,:),50,Robot_Accuracy(3,:))
 disp(TAcc);
 
-% figure (2);
-% subplot(331)
-% plot(surgicalTip_3D(1,12:235));
-% title('Surgical Tip Position X');
-% subplot(332)
-% plot(surgicalTip_3D_norm(1,12:235));
-% title('Normalized Surgical Tip Position X');
-% subplot(333)
-% plot(Robot_Accuracy(2,12:235));
-% title('Robot Effector Tip Position Y (Tracking X)');
-% subplot(334)
-% plot(surgicalTip_3D(2,12:235));
-% title('Surgical Tip Position Y');
-% subplot(335)
-% plot(surgicalTip_3D_norm(2,12:235));
-% title('Normalized Surgical Tip Position Y');
-% subplot(336)
-% plot(Robot_Accuracy(3,12:235));
-% title('Robot Effector Tip Position Z (Tracking Y)');
-% subplot(337)
-% plot(surgicalTip_3D(3,12:235));
-% title('Surgical Tip Position Z');
-% subplot(338)
-% plot(surgicalTip_3D_norm(3,12:235));
-% title('Normalized Surgical Tip Position Z');
-% subplot(339)
-% plot(Robot_Accuracy(1,12:235));
-% title('Normalized Surgical Tip Position X (Tracking Z)');
-
-lower = 5;
+%% Accuracy plots
+lower = 7;
 upper = 235;
+
+figure;
+subplot(321)
+plot(surgicalTip_3D(1,lower:upper));
+title('Surgical Tip Position X');
+subplot(322)
+plot(Robot_Accuracy(2,lower:upper));
+title('Robot Effector Tip Position Y (Tracking X)');
+subplot(323)
+plot(surgicalTip_3D(2,lower:upper));
+title('Surgical Tip Position Y');
+subplot(324)
+plot(Robot_Accuracy(3,lower:upper));
+title('Robot Effector Tip Position Z (Tracking Y)');
+subplot(325)
+plot(surgicalTip_3D(3,lower:upper));
+title('Surgical Tip Position Z');
+subplot(326)
+plot(Robot_Accuracy(1,lower:upper));
+title('Normalized Surgical Tip Position X (Tracking Z)');
 
 figure
 subplot(321)
@@ -284,48 +287,48 @@ subplot(321)
 plot(point3d_2(1, lower:upper))
 title('Raw Blue Marker X')
 subplot(322)
-plot(trackedLocation_2(1, 52:150))
+plot(trackedLocation_2(1, lower:upper))
 title('Tracked Blue Marker X')
 subplot(323)
-plot(point3d_2(2, 52:150))
+plot(point3d_2(2, lower:upper))
 title('Raw Blue Marker Y')
 subplot(324)
-plot(trackedLocation_2(2, 52:150))
+plot(trackedLocation_2(2, lower:upper))
 title('Tracked Blue Marker Y')
 subplot(325)
-plot(point3d_2(3, 52:150))
+plot(point3d_2(3, lower:upper))
 title('Raw Blue Marker Z')
 subplot(326)
-plot(trackedLocation_2(3, 52:150))
+plot(trackedLocation_2(3, lower:upper))
 title('Tracked Blue Marker Z')
 
 figure
 subplot(321)
-plot(point3d_3(1, 52:150))
+plot(point3d_3(1, lower:upper))
 title('Raw Red Marker X')
 subplot(322)
-plot(trackedLocation_3(1, 52:150))
+plot(trackedLocation_3(1, lower:upper))
 title('Tracked Red Marker X')
 subplot(323)
 plot(point3d_3(2, 52:150))
 title('Raw Red Marker Y')
 subplot(324)
-plot(trackedLocation_3(2, 52:150))
+plot(trackedLocation_3(2, lower:upper))
 title('Tracked Red Marker Y')
 subplot(325)
 plot(point3d_3(3, 52:150))
 title('Raw Red Marker Z')
 subplot(326)
-plot(trackedLocation_3(3, 52:150))
+plot(trackedLocation_3(3, lower:upper))
 title('Tracked Red Marker Z')
 
 figure;
 subplot(311)
-plot(surgicalTip_3D(1,52:150));
+plot(surgicalTip_3D(1,lower:upper));
 title('Surgical Tip Position X');
 subplot(312)
-plot(surgicalTip_3D(2,52:150));
+plot(surgicalTip_3D(2,lower:upper));
 title('Surgical Tip Position Y');
 subplot(313)
-plot(surgicalTip_3D(3,52:150));
+plot(surgicalTip_3D(3,lower:upper));
 title('Surgical Tip Position Z');
