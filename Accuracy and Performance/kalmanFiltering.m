@@ -38,8 +38,8 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ...
 
 kalmanFilter = [];
 isTrackInitialized = false;
-initialEstimateError = [1 1 1]*1e5;
-MotionNoise = [25, 10, 10];
+initialEstimateError = [1 1]*1e5;
+MotionNoise = [25, 10];
 measurementNoise = 10;
 surgicalTip_3D = zeros(3, nFramesLeft);
 point3d_1 = zeros(3, nFramesLeft);
@@ -50,6 +50,9 @@ trackedLocation_2 = zeros(3, nFramesLeft);
 trackedLocation_3 = zeros(3, nFramesLeft);
 
 %% 2D Kalman
+
+frames_skip = 1;
+
 
 for k = 1:frames_skip:nFramesLeft
 
@@ -119,7 +122,7 @@ plot(1:nFramesLeft,pos(:,1))
 frames_skip = 1;
 isTrackInitialized = 0;
 
-for k = 1:frames_skip:nFramesLeft
+for k = 50:frames_skip:150
     %Read Frames
     frameLeft = mov(k).readerLeft;
     frameRight = mov(k).readerRight;
@@ -144,11 +147,11 @@ for k = 1:frames_skip:nFramesLeft
     else
         [point3d_1(:,k),point3d_2(:,k), point3d_3(:,k)] = findWorldCoordinates(centroidLeft,centroidRight,stereoParams);
         if isTrackInitialized == 0
-            kalmanFilter_1 = configureKalmanFilter('ConstantAcceleration',...
+            kalmanFilter_1 = configureKalmanFilter('ConstantVelocity',...
                 point3d_1(:,k), initialEstimateError, MotionNoise,measurementNoise);
-            kalmanFilter_2 = configureKalmanFilter('ConstantAcceleration',...
+            kalmanFilter_2 = configureKalmanFilter('ConstantVelocity',...
                 point3d_2(:,k), initialEstimateError, MotionNoise,measurementNoise);
-            kalmanFilter_3 = configureKalmanFilter('ConstantAcceleration',...
+            kalmanFilter_3 = configureKalmanFilter('ConstantVelocity',...
                 point3d_3(:,k), initialEstimateError, MotionNoise,measurementNoise);
             isTrackInitialized = 1;
             [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(point3d_1(:,k),point3d_2(:,k),point3d_3(:,k),pivotOffset);
@@ -166,75 +169,74 @@ end
 
 figure
 subplot(321)
-plot(point3d_1(1, 5:235))
+plot(point3d_1(1, 52:150))
 title('Raw Green Marker X')
 subplot(322)
-plot(trackedLocation_1(1, 5:235))
+plot(trackedLocation_1(1, 52:150))
 title('Tracked Green Marker X')
 subplot(323)
-plot(point3d_1(2, 5:235))
+plot(point3d_1(2, 52:150))
 title('Raw Green Marker Y')
 subplot(324)
-plot(trackedLocation_1(2, 5:235))
+plot(trackedLocation_1(2, 52:150))
 title('Tracked Green Marker Y')
 subplot(325)
-plot(point3d_1(3, 5:235))
+plot(point3d_1(3, 52:150))
 title('Raw Green Marker Z')
 subplot(326)
-plot(trackedLocation_1(3, 5:235))
+plot(trackedLocation_1(3, 52:150))
 title('Tracked Green Marker Z')
 
 figure
 subplot(321)
-plot(point3d_2(1, 5:235))
+plot(point3d_2(1, 52:150))
 title('Raw Blue Marker X')
 subplot(322)
-plot(trackedLocation_2(1, 5:235))
+plot(trackedLocation_2(1, 52:150))
 title('Tracked Blue Marker X')
 subplot(323)
-plot(point3d_2(2, 5:235))
+plot(point3d_2(2, 52:150))
 title('Raw Blue Marker Y')
 subplot(324)
-plot(trackedLocation_2(2, 5:235))
+plot(trackedLocation_2(2, 52:150))
 title('Tracked Blue Marker Y')
 subplot(325)
-plot(point3d_2(3, 5:235))
+plot(point3d_2(3, 52:150))
 title('Raw Blue Marker Z')
 subplot(326)
-plot(trackedLocation_2(3, 5:235))
+plot(trackedLocation_2(3, 52:150))
 title('Tracked Blue Marker Z')
 
 figure
 subplot(321)
-plot(point3d_3(1, 5:235))
+plot(point3d_3(1, 52:150))
 title('Raw Red Marker X')
 subplot(322)
-plot(trackedLocation_3(1, 5:235))
+plot(trackedLocation_3(1, 52:150))
 title('Tracked Red Marker X')
 subplot(323)
-plot(point3d_3(2, 5:235))
+plot(point3d_3(2, 52:150))
 title('Raw Red Marker Y')
 subplot(324)
-plot(trackedLocation_3(2, 5:235))
+plot(trackedLocation_3(2, 52:150))
 title('Tracked Red Marker Y')
 subplot(325)
-plot(point3d_3(3, 5:235))
+plot(point3d_3(3, 52:150))
 title('Raw Red Marker Z')
 subplot(326)
-plot(trackedLocation_3(3, 5:235))
+plot(trackedLocation_3(3, 52:150))
 title('Tracked Red Marker Z')
-
 
 figure;
 subplot(311)
-plot(surgicalTip_3D(1,20:235));
+plot(surgicalTip_3D(1,52:150));
 title('Surgical Tip Position X');
 subplot(312)
-plot(surgicalTip_3D(2,20:235));
+plot(surgicalTip_3D(2,52:150));
 title('Surgical Tip Position Y');
 subplot(313)
-plot(surgicalTip_3D(3,20:235));
+plot(surgicalTip_3D(3,52:150));
 title('Surgical Tip Position Z');
-
-TAcc = trackingAccuracy(surgicalTip_3D(1,:),50,surgicalTip_3D(1,:))
-disp(TAcc);
+% 
+% TAcc = trackingAccuracy(surgicalTip_3D(1,52:150),50,surgicalTip_3D(1,52:150))
+% disp(TAcc);
