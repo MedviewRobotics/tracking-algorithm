@@ -109,10 +109,10 @@ Contributions are what make the open source community such an amazing place to b
 <!-- CONTACT -->
 ## Contact
 
-1. Claudia Alonzo -
+1. Claudia Alonzo - claudia.alonzo@ryerson.ca
 2. Ginette Hartell - ghartell@ryerson.ca
-3. Jay Tailor -
-4. Aziz Uddin -
+3. Jay Tailor - jay.tailor@ryerson.ca
+4. Aziz Uddin - aziz.uddin@ryerson.ca
 
 Project Link: [https://github.com/MedviewRobotics/tracking-algorithm](https://github.com/MedviewRobotics/tracking-algorithm)
 
