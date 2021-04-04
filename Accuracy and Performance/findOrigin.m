@@ -1,4 +1,4 @@
-function [x_origin,y_origin, z_origin] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams)
+function [x_origin,y_origin,z_origin,rotMatrix] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams)
 
 surgicalTip_3D = zeros(3,nFramesLeft);
 kalmanFilter_1 = [];
