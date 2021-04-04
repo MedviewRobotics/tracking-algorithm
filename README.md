@@ -36,7 +36,7 @@
   <h3 align="center">Robotic Automated Microscopy</h3>
 
   <p align="center">
-    project_description
+    This robotic automated microscopy system aims to improve surgical safety through the tracking of a surgical instrument throughout surgery. The system adjusts the    position of a microscope at the end-effector of a robotic arm accordingly to provide a zoomed-in view of the surgical field.
     <br />
     <a href="https://github.com/MedviewRobotics/tracking-algorithm"><strong>Explore the docs »</strong></a>
     <br />
