@@ -174,9 +174,9 @@ Project Link: [https://github.com/MedviewRobotics/tracking-algorithm](https://gi
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/MedviewRobotics/repo.svg?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/MedviewRobotics/tracking-algorithm.svg?style=for-the-badge
 [contributors-url]: https://github.com/MedviewRobotics/tracking-algorithm/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/MedviewRobotics/repo.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/MedviewRobotics/tracking-algorithm.svg?style=for-the-badge
 [forks-url]: https://github.com/MedviewRobotics/tracking-algorithm/network/members
-[issues-shield]: https://img.shields.io/github/issues/MedviewRobotics/repo.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/MedviewRobotics/tracking-algorithm.svg?style=for-the-badge
 [issues-url]: https://github.com/MedviewRobotics/tracking-algorithm/issues
