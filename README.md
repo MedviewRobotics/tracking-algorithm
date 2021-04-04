@@ -73,6 +73,8 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
+
+</br>
 <p align="center">
   <a href="https://github.com/MedviewRobotics/tracking-algorithm">
     <img src="images/Assembly of Components v11.gif" alt="Logo" width="640" height="271">
@@ -82,9 +84,8 @@
 
 ### Built With
 
-* []()
-* []()
-* []()
+* [MATLAB2020a](https://www.mathworks.com/products/new_products/release2020a.html?s_tid=srchtitle)
+* [Peter Corke Robotic's Toolbox](https://petercorke.com/toolboxes/robotics-toolbox/)
 
 
 <!-- GETTING STARTED -->
@@ -92,25 +93,16 @@
 
 To get a local copy up and running follow these simple steps.
 
-### Prerequisites
-
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+### Pre-Requisites
 
 ### Installation
 
-1. Clone the repo
+1. Pre-requisites via links provideds
+
+2. Clone the repo
    ```sh
    git clone https://github.com/MedviewRobotics/tracking-algorithm.git
    ```
-2. Install NPM packages
-   ```sh
-   npm install
-   ```
-
 
 <!-- USAGE EXAMPLES -->
 ## Usage
