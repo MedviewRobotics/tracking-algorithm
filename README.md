@@ -101,7 +101,8 @@ To get a local copy up and running follow these simple steps.
 
 The entire system can be ran from the [Main.m](https://github.com/MedviewRobotics/tracking-algorithm/blob/main/Accuracy%20and%20Performance/Main.m) file in the Accuracy and Performance folder. By default the system will read in one of the trial videos that we have prepared for demonstration purposes.
 </br>
-A full demonstration of the code will be uploaded shortly and this ReadMe will be updated.
+</br>
+A full demonstration of the code will be uploaded shortly and this README will be updated.
 
 <!-- CONTRIBUTING -->
 ## Contributing
