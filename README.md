@@ -110,7 +110,7 @@ Contributions are what make the open source community such an amazing place to b
 ## Contact
 
 1. Claudia Alonzo - claudia.alonzo@ryerson.ca
-2. Ginette Hartell - ghartell@ryerson.ca
+2. Ginette Hartell - [LinkedIn](https://www.linkedin.com/in/ginette-hartell/) - ghartell@ryerson.ca
 3. Jay Tailor - jay.tailor@ryerson.ca
 4. Aziz Uddin - aziz.uddin@ryerson.ca
 
