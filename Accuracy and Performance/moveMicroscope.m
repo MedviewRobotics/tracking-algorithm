@@ -52,7 +52,7 @@ qf = AT03.ikine(T_start,'q0',q0);
 [Q,QD,QDD] = jtraj(q0, qf, 10);
 
 if k>25
-    AT03.plot(Q);
+    %AT03.plot(Q);
 end
 %AT03.plot3d(Q,'view','y','path','C:\Users\bluet\Documents\Capstone_New\OTS\tracking-algorithm\Accuracy and Performance\robot\data\ARTE4','floorlevel',-175,'base');
 

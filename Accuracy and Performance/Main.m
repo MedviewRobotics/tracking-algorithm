@@ -64,9 +64,6 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ...
     'MaximumBlobArea', 20000, ...
     'MaximumCount',3);
 
-[Robot,q0] = initializeMicroscope();
-
-[x_origin,y_origin, z_origin] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
 
 %Initialize Arrays
 surgicalTip_3D = zeros(3, nFramesLeft);
@@ -88,7 +85,6 @@ elapsed_4 = zeros(1, nFramesLeft);
 
 %Initialize variables
 pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
-threshold = 245; % Threshold for Grayscale
 frames_skip = 1;
 isTrackInitialized = 0;
 initialEstimateError = [1 1]*1e5;
@@ -96,6 +92,9 @@ MotionNoise = [25, 10];
 % initialEstimateError = [1 1 1]*1e5;
 % MotionNoise = [25, 10, 10];
 measurementNoise = 10;
+
+[Robot,q0] = initializeMicroscope();
+[x_origin,y_origin, z_origin] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
 
 disp('Initialization Completed.');
 
@@ -230,6 +229,9 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 TAcc = trackingAccuracy(surgicalTip_3D(2,:),50,Robot_Accuracy(3,:))
 disp(TAcc);
 
+lower = 1;
+upper = 235;
+
 figure;
 subplot(321)
 plot(surgicalTip_3D(1,lower:upper));
@@ -249,9 +251,6 @@ title('Surgical Tip Position Z');
 subplot(326)
 plot(Robot_Accuracy(1,lower:upper));
 title('Normalized Surgical Tip Position X (Tracking Z)');
-
-lower = 1;
-upper = 235;
 
 figure
 subplot(321)
