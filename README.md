@@ -121,10 +121,11 @@ Project Link: [https://github.com/MedviewRobotics/tracking-algorithm](https://gi
 <!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
 
-* []()
-* []()
-* []()
+First and foremost, we would like to express our deep and sincere gratitude to our faculty advisor Dr. Ali Tavallaei for his outstanding commitment to our success in this project. Dr. Tavallaei has been patient and thorough when explaining new concepts to us and has been an expert at tying these new concepts back to theory that we have learned in our previous courses. He has challenged us to make design decisions based on data and solid justifications, which has helped us deepen our learning as a team.
 
+We would also like to extend our appreciation to our Biomedical Image Analysis Professor, Dr. April Khademi. Dr. Khademi has been instrumental in our learning of the core concepts of image processing, and was gracious enough to extend her mentorship beyond the field of medical image processing to help us evaluate the effectiveness of our object tracking algorithm.
+
+Additionally, we would like to sincerely thank Josh Richmond of Synaptive Medical for his insight into the challenges and intricacies of the surgical system navigation industry. His emphasis on an iterative approach to product development was extremely helpful throughout the course of this project.
 
 
 
