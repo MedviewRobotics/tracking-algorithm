@@ -75,7 +75,7 @@
 ## About The Project
 <p align="center">
   <a href="https://github.com/MedviewRobotics/tracking-algorithm">
-    <img src="images/Logo.png" alt="Logo" width="338" height="361">
+    <img src="images/Assembly of Components v11.gif" alt="Logo" width="1280" height="542">
   </a>
 </p>
 
