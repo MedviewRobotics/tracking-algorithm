@@ -20,11 +20,9 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
-<p align="center">
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Issues][issues-shield]][issues-url]
-</p>
 
 
 <!-- PROJECT LOGO -->
@@ -70,7 +68,6 @@
     <li><a href="#usage">Usage</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgements">Acknowledgements</a></li>
   </ol>
@@ -80,12 +77,11 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
-Here's a blank template to get started:
-**To avoid retyping too much info. Do a search and replace with your text editor for the following:**
-`MedviewRobotics`, `tracking-algorithm`, `twitter_handle`, `email`, `Robotic Automated Microscopy`, `project_description`
+<p align="center">
+  <a href="https://github.com/MedviewRobotics/tracking-algorithm">
+    <img src="images/Logo.png" alt="Logo" width="338" height="361">
+  </a>
+</p>
 
 
 ### Built With
