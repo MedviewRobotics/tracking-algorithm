@@ -1,48 +1,20 @@
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Thanks again! Now go create something AMAZING! :D
-***
-***
-***
-*** To avoid retyping too much info. Do a search and replace for the following:
-*** github_username, repo_name, twitter_handle, email, project_title, project_description
--->
-
-
-
-<!-- PROJECT SHIELDS -->
-<!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
--->
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Issues][issues-shield]][issues-url]
-
 
 
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
   <a href="https://github.com/MedviewRobotics/tracking-algorithm">
-    <img src="images/Logo.png" alt="Logo" width="267" height="262">
+    <img src="images/Logo.png" alt="Logo" width="225" height="240">
   </a>
 
   <h3 align="center">Robotic Automated Microscopy</h3>
 
   <p align="center">
-    This robotic automated microscopy system aims to improve surgical safety through the tracking of a surgical instrument throughout surgery. The system adjusts the    position of a microscope at the end-effector of a robotic arm accordingly to provide a zoomed-in view of the surgical field.
+    This robotic automated microscopy system aims to improve surgical safety through the tracking of a surgical instrument throughout surgery. Given the location of the surgical instrument provided by the CV tracking algorithm, the control system will adjust the position of a microscope at the end-effector of a robotic arm accordingly to provide a zoomed-in view of the surgical field.
     <br />
-    <a href="https://github.com/MedviewRobotics/tracking-algorithm"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/MedviewRobotics/tracking-algorithm">View Demo</a>
-    ·
     <a href="https://github.com/MedviewRobotics/tracking-algorithm/issues">Report Bug</a>
     ·
     <a href="https://github.com/MedviewRobotics/tracking-algorithm/issues">Request Feature</a>
@@ -69,9 +41,7 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgements">Acknowledgements</a></li>
   </ol>
@@ -82,18 +52,28 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
-Here's a blank template to get started:
-**To avoid retyping too much info. Do a search and replace with your text editor for the following:**
-`MedviewRobotics`, `tracking-algorithm`, `twitter_handle`, `email`, `Robotic Automated Microscopy`, `project_description`
-
+</br>
+<p align="center">
+  <a href="https://github.com/MedviewRobotics/tracking-algorithm">
+    <img src="images/Assembly of Components v11.gif" alt="Animation of Project" width="640" height="271">
+  </a>
+</p>
+</br>
+Our team designed a Robotic Automated Microscopy System for our final capstone design project for the Department of Electrical, Computer, and Biomedical Engineering at Ryerson University. This system is designed to improve the accuracy and safety of surgical procedures, and maintain an ergonomic experience for the OR staff. The parameters of this design challenge were to accomplish this task with a minimum of two degrees of freedom (DOF), a control system operating at a minimum of 10Hz, a tracking system operating at a minimum of 20FPS, and have the entire system adjust to a surgeon’s movements in as close to real-time as possible.
+</br>
+</br>
+The high-level workflow of our system can be visualized as follows:
+</br>
+<p align="center">
+  <a href="https://github.com/MedviewRobotics/tracking-algorithm">
+    <img src="images/workflow.png" alt="Workflow" width="667" height="251">
+  </a>
+</p> 
 
 ### Built With
 
-* []()
-* []()
-* []()
+* [MATLAB2020a](https://www.mathworks.com/products/new_products/release2020a.html?s_tid=srchtitle)
+* [Peter Corke Robotic's Toolbox](https://petercorke.com/toolboxes/robotics-toolbox/)
 
 
 <!-- GETTING STARTED -->
@@ -101,41 +81,28 @@ Here's a blank template to get started:
 
 To get a local copy up and running follow these simple steps.
 
-### Prerequisites
+### Pre-Requisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+* [MATLAB2020a](https://www.mathworks.com/products/new_products/release2020a.html?s_tid=srchtitle)
+* [MATLAB Computer Vision Toolbox](https://www.mathworks.com/help/vision/index.html?searchHighlight=Computer%20vision&s_tid=srchtitle) 
+* [MATLAB Image Processing Toolbox](https://www.mathworks.com/products/image.html?s_tid=srchtitle)
+* [MATLAB Communications Toolbox](https://www.mathworks.com/help/comm/index.html?s_tid=srchtitle)
 
 ### Installation
 
-1. Clone the repo
+1. Install pre-requisites via links provided
+2. Clone the repo
    ```sh
    git clone https://github.com/MedviewRobotics/tracking-algorithm.git
    ```
-2. Install NPM packages
-   ```sh
-   npm install
-   ```
-
 
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-
-
-<!-- ROADMAP -->
-## Roadmap
-
-See the [open issues](https://github.com/MedviewRobotics/tracking-algorithm/issues) for a list of proposed features (and known issues).
-
-
+The entire system can be ran from the [Main.m](https://github.com/MedviewRobotics/tracking-algorithm/blob/main/Accuracy%20and%20Performance/Main.m) file in the Accuracy and Performance folder. By default the system will read in one of the trial videos that we have prepared for demonstration purposes.
+</br>
+</br>
+A full demonstration of the code will be uploaded shortly and this README will be updated.
 
 <!-- CONTRIBUTING -->
 ## Contributing
@@ -152,22 +119,19 @@ Contributions are what make the open source community such an amazing place to b
 <!-- CONTACT -->
 ## Contact
 
-1. Claudia Alonzo -
-2. Ginette Hartell - ghartell@ryerson.ca
-3. Jay Tailor -
-4. Aziz Uddin -
-
-Project Link: [https://github.com/MedviewRobotics/tracking-algorithm](https://github.com/MedviewRobotics/tracking-algorithm)
-
-
+1. Claudia Alonzo - [LinkedIn](https://www.linkedin.com/in/claudia-alonzo098/) - claudia.alonzo@ryerson.ca
+2. Ginette Hartell - [LinkedIn](https://www.linkedin.com/in/ginette-hartell/) - ghartell@ryerson.ca
+3. Jay Tailor - [LinkedIn](https://www.linkedin.com/in/tailor-jay/) - jay.tailor@ryerson.ca
+4. Aziz Uddin - [LinkedIn](https://www.linkedin.com/in/azizuddin1234/) - aziz.uddin@ryerson.ca
 
 <!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
 
-* []()
-* []()
-* []()
+First and foremost, we would like to express our deep and sincere gratitude to our faculty advisor Dr. Ali Tavallaei for his outstanding commitment to our success in this project. Dr. Tavallaei has been patient and thorough when explaining new concepts to us and has been an expert at tying these new concepts back to theory that we have learned in our previous courses. He has challenged us to make design decisions based on data and solid justifications, which has helped us deepen our learning as a team.
 
+We would also like to extend our appreciation to our Biomedical Image Analysis Professor, Dr. April Khademi. Dr. Khademi has been instrumental in our learning of the core concepts of image processing, and was gracious enough to extend her mentorship beyond the field of medical image processing to help us evaluate the effectiveness of our object tracking algorithm.
+
+Additionally, we would like to sincerely thank Josh Richmond of Synaptive Medical for his insight into the challenges and intricacies of the surgical system navigation industry. His emphasis on an iterative approach to product development was extremely helpful throughout the course of this project.
 
 
 

@@ -20,23 +20,17 @@ load("stereoParamsAccuracy.mat");
 %addpath(genpath('Trial 18-19'));
 %load("stereoParams18.mat");
 
-readerLeft = VideoReader('myLeftTrialVert5cm.avi');
-readerRight = VideoReader('myRightTrialVert5cm.avi');
+%readerLeft = VideoReader('myLeftTrialVert5cm.avi');
+%readerRight = VideoReader('myRightTrialVert5cm.avi');
 
-% readerLeft = VideoReader('myLeftTrialVert5cm.avi');
-% readerRight = VideoReader('myRightTrialVert5cm.avi');
+%readerLeft = VideoReader('myLeftTrialNormal8.avi');
+%readerRight = VideoReader('myRightTrialNormal8.avi');
 
-% readerLeft = VideoReader('myLeftTrialVert5cm.avi');
-% readerRight = VideoReader('myRightTrialVert5cm.avi');
+readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
+readerRight = VideoReader('myRightTrialHoriz5cm.avi');
 
-% readerLeft = VideoReader('myLeftTrialNormal8.avi');
-% readerRight = VideoReader('myRightTrialNormal8.avi');
-
-%readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
-%readerRight = VideoReader('myRightTrialHoriz5cm.avi');
-
-% readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
-% readerRight = VideoReader('myRightTrialHoriz10cm.avi');
+%readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
+%readerRight = VideoReader('myRightTrialHoriz10cm.avi');
 
 pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
 threshold = 245; % Threshold for Grayscale
@@ -73,6 +67,7 @@ pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
 threshold = 245; % Threshold for Grayscale
 [x_origin,y_origin, z_origin] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
 
+
 %Initialize Arrays
 surgicalTip_3D = zeros(3, nFramesLeft);
 Robot_Accuracy = zeros(3, nFramesLeft);
@@ -97,14 +92,16 @@ j = zeros(3);
 
 %Initialize variables
 pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
-threshold = 245; % Threshold for Grayscale
 frames_skip = 1;
-isTrackInitialized = 0;
 initialEstimateError = [1 1]*1e5;
 MotionNoise = [25, 10];
 % initialEstimateError = [1 1 1]*1e5;
 % MotionNoise = [25, 10, 10];
 measurementNoise = 10;
+
+[x_origin,y_origin,z_origin,rot] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
+[Robot,q0] = initializeMicroscope(x_origin,y_origin,z_origin,rot);
+
 movement_1 = 1;
 movement_2 = 37;
 movement_3 = 81;
@@ -125,24 +122,24 @@ open(v)
 
 for k = 1:frames_skip:nFramesLeft
     tic %Starts pre-processing timer
-    
+
     %Read Frames
     frameLeft = mov(k).readerLeft;
     frameRight = mov(k).readerRight;
-    
+
     %Initate preprocessing of frames
     [frameLeftGray,frameRightGray] = preprocessFrames(frameLeft,frameRight);
-    
+
     %End preprocessing phase
     elapsed_1(k) = toc;
-    
+
     %Start timer for finding tip
     tic;
-    
+
     %Find centroids in left and right frames
     [centroidLeft, bboxLeft, centroidRight, bboxRight] = ...
         findCentroids(frameLeftGray,frameRightGray,threshold,hblob);
-    
+
     %Validate position of centroids
     if size(centroidLeft) ~= [3 3] | size(centroidRight) ~= [3 3]
         warning(['Could not detect marker(s) in frame: ', num2str(k), ', using predicted locations'])
@@ -186,7 +183,7 @@ for k = 1:frames_skip:nFramesLeft
             [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
         end
         elapsed_2(k) = toc; %End find tip timer
-        
+
         %Plotting in video player
         rgb = insertShape(frameLeft,'rectangle',bboxLeft(1,:),'Color','black',...
             'LineWidth',3);
@@ -194,25 +191,25 @@ for k = 1:frames_skip:nFramesLeft
             'LineWidth',3);
         rgb = insertShape(rgb,'rectangle',bboxLeft(3,:),'Color','black',...
             'LineWidth',3);
-        
+
         rgb = insertText(rgb,centroidLeft(1,:) - 20,['X: ' num2str(round(point3d_1(1,k)),'%d')...
             ' Y: ' num2str(round(point3d_1(2,k)),'%d') ' Z: ' num2str(round(point3d_1(3,k)))],'FontSize',18);
         rgb = insertText(rgb,centroidLeft(2,:) + 50,['X: ' num2str(round(point3d_2(1,k)),'%d')...
             ' Y: ' num2str(round(point3d_2(2,k)),'%d') ' Z: ' num2str(round(point3d_2(3,k)))],'FontSize',18);
         rgb = insertText(rgb,centroidLeft(3,:) - 50,['X: ' num2str(round(point3d_3(1,k)),'%d')...
             ' Y: ' num2str(round(point3d_3(2,k)),'%d') ' Z: ' num2str(round(point3d_3(3,k)))],'FontSize',18);
-        
-        eul = rotm2eul(rotMatrix);
+
+        eul = rotm2eul(rotMatrix)
         player(rgb);
         writeVideo(v,rgb);
     end
-    
+
     %Start world2microscope timer
     tic;
-    
+
     %Find location in microscope coordinates
     [xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D(1, k), surgicalTip_3D(3, k), surgicalTip_3D(2, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
-    
+
     %End world2microscope timer
     elapsed_3(k) = toc;
 
