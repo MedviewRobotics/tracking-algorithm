@@ -38,6 +38,9 @@ readerRight = VideoReader('myRightTrialVert5cm.avi');
 % readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
 % readerRight = VideoReader('myRightTrialHoriz10cm.avi');
 
+pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
+threshold = 245; % Threshold for Grayscale
+
 %Set up for skipping n frames
 nFramesLeft = readerLeft.NumFrames;
 vidHeightLeft = readerLeft.Height;
@@ -66,6 +69,8 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ...
 
 [Robot,q0] = initializeMicroscope();
 
+pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
+threshold = 245; % Threshold for Grayscale
 [x_origin,y_origin, z_origin] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
 
 %Initialize Arrays
@@ -88,6 +93,7 @@ elapsed_1 = zeros(1, nFramesLeft);
 elapsed_2 = zeros(1, nFramesLeft);
 elapsed_3 = zeros(1, nFramesLeft);
 elapsed_4 = zeros(1, nFramesLeft);
+j = zeros(3);
 
 %Initialize variables
 pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
@@ -155,7 +161,7 @@ for k = 1:frames_skip:nFramesLeft
         [point3d_1(:,k),point3d_2(:,k), point3d_3(:,k)] = findWorldCoordinates(centroidLeft,centroidRight,stereoParams);
         if k == movement_1 | k == movement_2 | k == movement_3
             if k == movement_1
-                surgicalTip_3D(:, k) = findSurgicalTip(point3d_1(:,k),point3d_2(:,k),point3d_3(:,k),pivotOffset);
+                [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(point3d_1(:,k),point3d_2(:,k),point3d_3(:,k),pivotOffset);
             else
                 kalmanFilter_temp_1 = kalmanFilter_1;
                 kalmanFilter_temp_2 = kalmanFilter_2;
@@ -209,18 +215,18 @@ for k = 1:frames_skip:nFramesLeft
     
     %End world2microscope timer
     elapsed_3(k) = toc;
-    
-    %Start control system timer
-    tic;
-    
-    %Initiate control system
-    [q0,X,Y,Z,Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul, k);
-    
-    %End control system timer
-    elapsed_4(k) = toc;
-    
-    %Log control system accuracy
-    Robot_Accuracy(:,k) = [X,Y,Z];
+
+    if rem(k, 5) == 0
+        %Start control system timer
+        tic;
+        %Initiate control system
+        [q0,X,Y,Z,Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul, k);
+        %Log control system accuracy
+        Robot_Accuracy(:,k) = [X,Y,Z];
+        %End control system timer
+        elapsed_4(k) = toc;
+    end
+  
 end
 
 release(player)
