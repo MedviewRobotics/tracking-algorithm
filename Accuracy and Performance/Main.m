@@ -205,7 +205,7 @@ for k = 1:frames_skip:nFramesLeft
     tic;
     
     %Find location in microscope coordinates
-    [xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D(1, k), surgicalTip_3D(2, k), surgicalTip_3D(3, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
+    [xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D(1, k), surgicalTip_3D(3, k), surgicalTip_3D(2, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
     
     %End world2microscope timer
     elapsed_3(k) = toc;
