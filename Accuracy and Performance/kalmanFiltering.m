@@ -38,14 +38,15 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ...
 
 kalmanFilter = [];
 isTrackInitialized = false;
-initialEstimateError = [1 1]*1e5;
-MotionNoise = [25, 10];
-measurementNoise = 10;
+initialEstimateError = [0.5 0.5 0.5]*1e5;
+MotionNoise = [5, 5, 5];
+measurementNoise = 0.2;
 surgicalTip_3D = zeros(3, nFramesLeft);
 point3d_1 = zeros(3, nFramesLeft);
 point3d_2 = zeros(3, nFramesLeft);
 point3d_3 = zeros(3, nFramesLeft);
-trackedLocation_1 = zeros(3, nFramesLeft);
+red_marker = zeros(2, nFramesLeft);
+trackedLocation_1 = zeros(2, nFramesLeft);
 trackedLocation_2 = zeros(3, nFramesLeft);
 trackedLocation_3 = zeros(3, nFramesLeft);
 
@@ -118,7 +119,6 @@ plot(1:nFramesLeft,pos(:,1))
 
 %% 3D Kalman
 
-
 frames_skip = 1;
 isTrackInitialized = 0;
 
@@ -164,6 +164,101 @@ for k = 50:frames_skip:150
     end
 end
 
+%% Ginette 2D Kalman Demo
+
+frames_skip = 1;
+isTrackInitialized = 0;
+
+for k = 60:frames_skip:135
+    %Read Frames
+    frameLeft = mov(k).readerLeft;
+    frameRight = mov(k).readerRight;
+    
+    %Initate preprocessing of frames
+    [frameLeftGray,frameRightGray] = preprocessFrames(frameLeft,frameRight);
+    
+    %Find centroids in left and right frames
+    [centroidLeft, bboxLeft, centroidRight, bboxRight] = ...
+        findCentroids(frameLeftGray,frameRightGray,threshold,hblob);
+    
+    %Validate position of centroids
+    if size(centroidLeft) == [2 2]
+        warning(['Could not find marker(s) in frame: ', num2str(k)])
+        red_marker(:, k) = red_marker(:, k-1);
+        trackedLocation_1(:,k) = trackedLocation_1(:,k-1);
+    else
+        red_marker(:, k) = centroidLeft(2, :);
+        if isTrackInitialized == 0
+            kalmanFilter_1 = configureKalmanFilter('ConstantAcceleration',...
+                red_marker(:, k), initialEstimateError, MotionNoise, measurementNoise);
+            isTrackInitialized = 1;
+        else
+            trackedLocation_1(:,k) = correct(kalmanFilter_1, red_marker(:, k));
+        end
+    end
+end
+
+%% Plot frames from demo
+textLabel_1 = sprintf('Detected');
+textLabel_2 = sprintf('Corrected');
+
+frame1 = 65;
+frame2 = 75;
+frame3 = 95;
+frame4 = 110;
+frame5 = 120;
+frame6 = 129;
+
+%Frame 15
+figure
+subplot(321)
+imshow(mov(frame1).readerLeft)
+hold on
+plot(red_marker(1,frame1),red_marker(2,frame1),'b.')
+text(red_marker(1,frame1), red_marker(2,frame1)+ 2, textLabel_1, 'Color', 'b');
+plot(trackedLocation_1(1,frame1),trackedLocation_1(2,frame1),'m.')
+text(trackedLocation_1(1,frame1), trackedLocation_1(2,frame1)- 2, textLabel_2, 'Color', 'm');
+hold off
+subplot(322)
+imshow(mov(frame2).readerLeft)
+hold on
+plot(red_marker(1,frame2),red_marker(2,frame2),'b.')
+text(red_marker(1,frame2), red_marker(2,frame2)+ 2, textLabel_1, 'Color', 'b');
+plot(trackedLocation_1(1,frame2),trackedLocation_1(2,frame2),'m.')
+text(trackedLocation_1(1,frame2), trackedLocation_1(2,frame2)- 2, textLabel_2, 'Color', 'm');
+hold off
+subplot(323)
+imshow(mov(frame3).readerLeft)
+hold on
+plot(red_marker(1,frame3),red_marker(2,frame3),'b.')
+text(red_marker(1,frame3), red_marker(2,frame3)+ 2, textLabel_1, 'Color', 'b');
+plot(trackedLocation_1(1,frame3),trackedLocation_1(2,frame3),'m.')
+text(trackedLocation_1(1,frame3), trackedLocation_1(2,frame3)- 2, textLabel_2, 'Color', 'm');
+hold off
+subplot(324)
+imshow(mov(frame4).readerLeft)
+hold on
+plot(red_marker(1,frame4),red_marker(2,frame4),'b.')
+text(red_marker(1,frame4), red_marker(2,frame4)+ 2, textLabel_1, 'Color', 'b');
+plot(trackedLocation_1(1,frame4),trackedLocation_1(2,frame4),'m.')
+text(trackedLocation_1(1,frame4), trackedLocation_1(2,frame4)- 2, textLabel_2, 'Color', 'm');
+hold off
+subplot(325)
+imshow(mov(frame5).readerLeft)
+hold on
+plot(red_marker(1,frame5),red_marker(2,frame5),'b.')
+text(red_marker(1,frame5), red_marker(2,frame5)+ 2, textLabel_1, 'Color', 'b');
+plot(trackedLocation_1(1,frame5),trackedLocation_1(2,frame5),'m.')
+text(trackedLocation_1(1,frame5), trackedLocation_1(2,frame5)- 2, textLabel_2, 'Color', 'm');
+hold off
+subplot(326)
+imshow(mov(frame6).readerLeft)
+hold on
+plot(red_marker(1,frame6),red_marker(2,frame6),'b.')
+text(red_marker(1,frame6), red_marker(2,frame6)+ 2, textLabel_1, 'Color', 'b');
+plot(trackedLocation_1(1,frame6),trackedLocation_1(2,frame6),'m.')
+text(trackedLocation_1(1,frame6), trackedLocation_1(2,frame6)- 2, textLabel_2, 'Color', 'm');
+hold off
 
 %%
 
