@@ -30,7 +30,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/MedviewRobotics/tracking-algorithm">
-    <img src="images/Logo.png" alt="Logo" width="607" height="296">
+    <img src="images/Logo.png" alt="Logo" width="267" height="262">
   </a>
 
   <h3 align="center">Robotic Automated Microscopy</h3>
