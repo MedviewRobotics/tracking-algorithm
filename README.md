@@ -52,7 +52,6 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Our team designed a Robotic Automated Microscopy System for our final capstone design project for the Department of Electrical, Computer, and Biomedical Engineering at Ryerson University. This system is designed to improve the accuracy and safety of surgical procedures, and maintain an ergonomic experience for the OR staff. The parameters of this design challenge were to accomplish this task with a minimum of two degrees of freedom (DOF), a control system operating at a minimum of 10Hz, a tracking system operating at a minimum of 20FPS, and have the entire system adjust to a surgeon’s movements in as close to real-time as possible.
 </br>
 <p align="center">
   <a href="https://github.com/MedviewRobotics/tracking-algorithm">
@@ -60,6 +59,8 @@ Our team designed a Robotic Automated Microscopy System for our final capstone d
   </a>
 </p>
 </br>
+</br>
+Our team designed a Robotic Automated Microscopy System for our final capstone design project for the Department of Electrical, Computer, and Biomedical Engineering at Ryerson University. This system is designed to improve the accuracy and safety of surgical procedures, and maintain an ergonomic experience for the OR staff. The parameters of this design challenge were to accomplish this task with a minimum of two degrees of freedom (DOF), a control system operating at a minimum of 10Hz, a tracking system operating at a minimum of 20FPS, and have the entire system adjust to a surgeon’s movements in as close to real-time as possible.
 </br>
 The high-level workflow of our system can be visualized as follows:
 </br>
@@ -91,7 +92,7 @@ To get a local copy up and running follow these simple steps.
 
 ### Installation
 
-1. Install pre-requisites via links provideds
+1. Install pre-requisites via links provided
 2. Clone the repo
    ```sh
    git clone https://github.com/MedviewRobotics/tracking-algorithm.git
@@ -100,10 +101,9 @@ To get a local copy up and running follow these simple steps.
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
-
+The entire system can be ran from the [Main.m](https://github.com/MedviewRobotics/tracking-algorithm/blob/main/Accuracy%20and%20Performance/Main.m) file in the Accuracy and Performance folder. By default the system will read in one of the trial videos that we have prepared for demonstration purposes.
+</br>
+A full demonstration of the code will be uploaded shortly and this ReadMe will be updated.
 
 <!-- CONTRIBUTING -->
 ## Contributing
@@ -124,10 +124,6 @@ Contributions are what make the open source community such an amazing place to b
 2. Ginette Hartell - [LinkedIn](https://www.linkedin.com/in/ginette-hartell/) - ghartell@ryerson.ca
 3. Jay Tailor - [LinkedIn](https://www.linkedin.com/in/tailor-jay/) - jay.tailor@ryerson.ca
 4. Aziz Uddin - [LinkedIn](https://www.linkedin.com/in/azizuddin1234/) - aziz.uddin@ryerson.ca
-
-Project Link: [https://github.com/MedviewRobotics/tracking-algorithm](https://github.com/MedviewRobotics/tracking-algorithm)
-
-
 
 <!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
