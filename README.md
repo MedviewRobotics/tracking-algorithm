@@ -7,7 +7,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/MedviewRobotics/tracking-algorithm">
-    <img src="images/Logo.png" alt="Logo" width="338" height="361">
+    <img src="images/Logo.png" alt="Logo" width="225" height="240">
   </a>
 
   <h3 align="center">Robotic Automated Microscopy</h3>
@@ -55,7 +55,7 @@
 </br>
 <p align="center">
   <a href="https://github.com/MedviewRobotics/tracking-algorithm">
-    <img src="images/Assembly of Components v11.gif" alt="Logo" width="640" height="271">
+    <img src="images/Assembly of Components v11.gif" alt="Animation of Project" width="640" height="271">
   </a>
 </p>
 
