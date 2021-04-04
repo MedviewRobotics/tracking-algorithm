@@ -37,9 +37,6 @@
   <p align="center">
     This robotic automated microscopy system aims to improve surgical safety through the tracking of a surgical instrument throughout surgery. Given the location of the surgical instrument provided by the CV tracking algorithm, the control system will adjust the position of a microscope at the end-effector of a robotic arm accordingly to provide a zoomed-in view of the surgical field.
     <br />
-    <a href="https://github.com/MedviewRobotics/tracking-algorithm"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
     <a href="https://github.com/MedviewRobotics/tracking-algorithm/issues">Report Bug</a>
     ·
     <a href="https://github.com/MedviewRobotics/tracking-algorithm/issues">Request Feature</a>
