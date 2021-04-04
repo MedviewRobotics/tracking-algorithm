@@ -52,13 +52,22 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
+Our team designed a Robotic Automated Microscopy System for our final capstone design project for the Department of Electrical, Computer, and Biomedical Engineering at Ryerson University. This system is designed to improve the accuracy and safety of surgical procedures, and maintain an ergonomic experience for the OR staff. The parameters of this design challenge were to accomplish this task with a minimum of two degrees of freedom (DOF), a control system operating at a minimum of 10Hz, a tracking system operating at a minimum of 20FPS, and have the entire system adjust to a surgeon’s movements in as close to real-time as possible.
 </br>
 <p align="center">
   <a href="https://github.com/MedviewRobotics/tracking-algorithm">
     <img src="images/Assembly of Components v11.gif" alt="Animation of Project" width="640" height="271">
   </a>
 </p>
-
+</br>
+The high-level workflow can be visualized as follows:
+</br>
+<p align="center">
+  <a href="https://github.com/MedviewRobotics/tracking-algorithm">
+    <img src="images/workflow.png" alt="Workflow" width="667" height="251">
+  </a>
+</p> D
+</br>
 
 ### Built With
 
