@@ -219,7 +219,7 @@ for k = 1:frames_skip:nFramesLeft
         %End control system timer
         elapsed_4(k) = toc;
     end
-  
+
 end
 
 release(player)
