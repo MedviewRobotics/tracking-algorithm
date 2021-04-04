@@ -60,7 +60,9 @@ Our team designed a Robotic Automated Microscopy System for our final capstone d
   </a>
 </p>
 </br>
-The high-level workflow can be visualized as follows:
+</br>
+The high-level workflow of our system can be visualized as follows:
+</br>
 </br>
 <p align="center">
   <a href="https://github.com/MedviewRobotics/tracking-algorithm">
