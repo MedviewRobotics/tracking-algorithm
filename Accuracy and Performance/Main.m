@@ -63,10 +63,6 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ...
 
 [Robot,q0] = initializeMicroscope();
 
-pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
-threshold = 245; % Threshold for Grayscale
-[x_origin,y_origin, z_origin] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
-
 
 %Initialize Arrays
 surgicalTip_3D = zeros(3, nFramesLeft);
