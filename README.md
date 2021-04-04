@@ -22,10 +22,7 @@
 -->
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
 
 
 
@@ -155,10 +152,10 @@ Contributions are what make the open source community such an amazing place to b
 <!-- CONTACT -->
 ## Contact
 
-Claudia Alonzo -
-Ginette Hartell - ghartell@ryerson.ca
-Jay Tailor -
-Aziz Uddin -
+1. Claudia Alonzo -
+2. Ginette Hartell - ghartell@ryerson.ca
+3. Jay Tailor -
+4. Aziz Uddin -
 
 Project Link: [https://github.com/MedviewRobotics/tracking-algorithm](https://github.com/MedviewRobotics/tracking-algorithm)
 
@@ -178,14 +175,8 @@ Project Link: [https://github.com/MedviewRobotics/tracking-algorithm](https://gi
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [contributors-shield]: https://img.shields.io/github/contributors/MedviewRobotics/repo.svg?style=for-the-badge
-[contributors-url]: https://github.com/MedviewRobotics/repo/graphs/contributors
+[contributors-url]: https://github.com/MedviewRobotics/tracking-algorithm/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/MedviewRobotics/repo.svg?style=for-the-badge
-[forks-url]: https://github.com/MedviewRobotics/repo/network/members
-[stars-shield]: https://img.shields.io/github/stars/MedviewRobotics/repo.svg?style=for-the-badge
-[stars-url]: https://github.com/MedviewRobotics/repo/stargazers
+[forks-url]: https://github.com/MedviewRobotics/tracking-algorithm/network/members
 [issues-shield]: https://img.shields.io/github/issues/MedviewRobotics/repo.svg?style=for-the-badge
-[issues-url]: https://github.com/MedviewRobotics/repo/issues
-[license-shield]: https://img.shields.io/github/license/MedviewRobotics/repo.svg?style=for-the-badge
-[license-url]: https://github.com/MedviewRobotics/repo/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/MedviewRobotics
+[issues-url]: https://github.com/MedviewRobotics/tracking-algorithm/issues
