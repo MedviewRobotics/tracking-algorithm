@@ -7,7 +7,7 @@
 %       AT03 = name of robot entity
 %       q0 = starting pose of the robot
 
-function [AT03,q0] = initializeMicroscope()
+function [AT03,q0] = initializeMicroscope(x_origin,y_origin,z_origin,rot)
 
 % Initialize Robot SerialLink
 L(1)=Link ([0 28 0 pi/2]);
@@ -18,11 +18,29 @@ L(5)=Link ([0 0 0 pi/2]);
 L(6)=Link ([0 5.5 0 0]);
 
 AT03=SerialLink(L,'name','AT03Robot');
-start_pos_new = [0 3.14/2 0 0 -3.14/2 0];
-T_start = AT03.fkine(start_pos_new);
-[Start_X,Start_Y,Start_Z] = transl(T_start);
-AT03.plot(start_pos_new);
+%start_pos_new = [0 3.14/2 0 0 -3.14/2 0];
+q0 = [0 3.14/2 0 -2.82 -2 0];
+%T_start = AT03.fkine(start_pos_new);
+%[Start_X,Start_Y,Start_Z] = transl(T_start);
 
+eul = rotm2eul(rot)
+R = eul(2); %3 
+P = eul(3); %1
+Y = eul(1); %2
+
+input_y = 0;
+
+input_x = 90;
+
+input_z = 159;
+%Call safety protocol function
+[x, y, z] = safetyprotocols(input_x, input_y, input_z); 
+
+% Get q_new to move to new pose
+T_start = transl(x,y,z) * rpy2tr(R,P,Y);
+
+start_pos_new = AT03.ikine(T_start,'q0',q0);
+AT03.plot(start_pos_new);
 q0=start_pos_new;
 
 end

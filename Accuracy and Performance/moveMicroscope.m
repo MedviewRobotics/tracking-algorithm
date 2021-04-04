@@ -32,13 +32,13 @@ function [newq0,x,y,z,Q] = moveMicroscope(input_x,input_y,input_z,q0,AT03,eul, k
 % P Moves about Robot Y-Axis (ZX)
 % Y moves about Robot Z-Axis (XY)
 
-% R = eul(3); 
-% P = eul(1);
-% Y = eul(2);
+R = eul(2); %3 
+P = eul(3); %1
+Y = eul(1); %2
 
-R = 3.14; 
-P = 0;
-Y = 0;
+%R = 3.14; 
+%P = 0;
+%Y = 0;
 
 %Call safety protocol function
 [x, y, z] = safetyprotocols(input_x, input_y, input_z); 
@@ -52,7 +52,7 @@ qf = AT03.ikine(T_start,'q0',q0);
 [Q,QD,QDD] = jtraj(q0, qf, 10);
 
 if k>25
-    %AT03.plot(Q);
+    AT03.plot(Q);
 end
 %AT03.plot3d(Q,'view','y','path','C:\Users\bluet\Documents\Capstone_New\OTS\tracking-algorithm\Accuracy and Performance\robot\data\ARTE4','floorlevel',-175,'base');
 

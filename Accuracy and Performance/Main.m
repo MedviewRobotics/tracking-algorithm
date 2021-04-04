@@ -20,23 +20,17 @@ load("stereoParamsAccuracy.mat");
 %addpath(genpath('Trial 18-19'));
 %load("stereoParams18.mat");
 
-readerLeft = VideoReader('myLeftTrialVert5cm.avi');
-readerRight = VideoReader('myRightTrialVert5cm.avi');
+%readerLeft = VideoReader('myLeftTrialVert5cm.avi');
+%readerRight = VideoReader('myRightTrialVert5cm.avi');
 
-% readerLeft = VideoReader('myLeftTrialVert5cm.avi');
-% readerRight = VideoReader('myRightTrialVert5cm.avi');
+%readerLeft = VideoReader('myLeftTrialNormal8.avi');
+%readerRight = VideoReader('myRightTrialNormal8.avi');
 
-% readerLeft = VideoReader('myLeftTrialVert5cm.avi');
-% readerRight = VideoReader('myRightTrialVert5cm.avi');
+readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
+readerRight = VideoReader('myRightTrialHoriz5cm.avi');
 
-% readerLeft = VideoReader('myLeftTrialNormal8.avi');
-% readerRight = VideoReader('myRightTrialNormal8.avi');
-
-%readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
-%readerRight = VideoReader('myRightTrialHoriz5cm.avi');
-
-% readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
-% readerRight = VideoReader('myRightTrialHoriz10cm.avi');
+%readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
+%readerRight = VideoReader('myRightTrialHoriz10cm.avi');
 
 %Set up for skipping n frames
 nFramesLeft = readerLeft.NumFrames;
@@ -86,15 +80,13 @@ elapsed_4 = zeros(1, nFramesLeft);
 %Initialize variables
 pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
 frames_skip = 1;
-isTrackInitialized = 0;
 initialEstimateError = [1 1]*1e5;
 MotionNoise = [25, 10];
 % initialEstimateError = [1 1 1]*1e5;
 % MotionNoise = [25, 10, 10];
 measurementNoise = 10;
-
-[Robot,q0] = initializeMicroscope();
-[x_origin,y_origin, z_origin] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
+[x_origin,y_origin,z_origin,rot] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
+[Robot,q0] = initializeMicroscope(x_origin,y_origin,z_origin,rot);
 
 disp('Initialization Completed.');
 
@@ -178,7 +170,7 @@ for k = 1:frames_skip:nFramesLeft
         rgb = insertText(rgb,centroidLeft(3,:) - 50,['X: ' num2str(round(point3d_3(1,k)),'%d')...
             ' Y: ' num2str(round(point3d_3(2,k)),'%d') ' Z: ' num2str(round(point3d_3(3,k)))],'FontSize',18);
         
-        eul = rotm2eul(rotMatrix);
+        eul = rotm2eul(rotMatrix)
         player(rgb);
         writeVideo(v,rgb);
     end
