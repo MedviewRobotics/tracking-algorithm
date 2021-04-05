@@ -21,7 +21,7 @@
 %       Y = ?
 %       Z = ?
 
-function [newq0,x,y,z,Q] = moveMicroscope(input_x,input_y,input_z,q0,AT03,eul, k)
+function [newq0,x,y,z,Q] = moveMicroscope(input_x,input_y,input_z,q0,AT03,eul)
 
 %while i<20
 
@@ -32,16 +32,9 @@ function [newq0,x,y,z,Q] = moveMicroscope(input_x,input_y,input_z,q0,AT03,eul, k
 % P Moves about Robot Y-Axis (ZX)
 % Y moves about Robot Z-Axis (XY)
 
-R = eul(2); %3 
-P = eul(3); %1
-Y = eul(1); %2
-
-%R = 3.14; 
-%P = 0;
-%Y = 0;
 
 %Call safety protocol function
-[x, y, z] = safetyprotocols(input_x, input_y, input_z); 
+[x, y, z, R, P, Y] = safetyprotocols(input_x, input_y, input_z, eul); 
 
 % Get q_new to move to new pose
 T_start = transl(x,y,z) * rpy2tr(R,P,Y);
@@ -53,7 +46,7 @@ qf = AT03.ikine(T_start,'q0',q0);
 
 AT03.plot(Q);
 hold on
-plot3(x, y, z - 30, 'b.');
+plot3(x, y, z - 60, 'b.');
 hold off
 
 %AT03.plot3d(Q,'view','y','path','C:\Users\bluet\Documents\Capstone_New\OTS\tracking-algorithm\Accuracy and Performance\robot\data\ARTE4','floorlevel',-175,'base');
@@ -61,7 +54,7 @@ hold off
 %New pose is now the old/start pose
 q0 = Q(end,:);
 T_start = AT03.fkine(q0);
-[X,Y,Z] = transl(T_start);
+[x,y,z] = transl(T_start);
 
 newq0 = q0;
 
