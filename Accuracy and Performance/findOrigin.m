@@ -1,4 +1,4 @@
-function [x_origin,y_origin,z_origin,rotMatrix,eul] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams)
+function [x_origin, y_origin, z_origin, eul] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams)
 
 surgicalTip_3D = zeros(3,nFramesLeft);
 eul = zeros(3,nFramesLeft);
@@ -46,14 +46,12 @@ for k = 1:frames_skip:nFramesLeft
             kalmanFilter_3 = configureKalmanFilter('ConstantVelocity',...
                 point3d_3(:,k), initialEstimateError, MotionNoise,measurementNoise);
             isTrackInitialized = 1;
-            [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(point3d_1(:,k),point3d_2(:,k),point3d_3(:,k),pivotOffset);
-            eul(:,k) = rotm2eul(rotMatrix);
+            [surgicalTip_3D(:, k), eul(:,k)] = findSurgicalTip(point3d_1(:,k),point3d_2(:,k),point3d_3(:,k),pivotOffset);
         else
             trackedLocation_1(:,k) = correct(kalmanFilter_1, point3d_1(:,k));
             trackedLocation_2(:,k) = correct(kalmanFilter_2, point3d_2(:,k));
             trackedLocation_3(:,k) = correct(kalmanFilter_3, point3d_3(:,k));
-            [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
-            eul(:,k) = rotm2eul(rotMatrix);
+            [surgicalTip_3D(:, k), eul(:,k)] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
         end
     end
 end

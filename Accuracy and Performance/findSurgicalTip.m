@@ -15,11 +15,11 @@
 %   OUTPUTS:
 %       surgicalTip_3D = 3D position of the surgical tip in world
 %           coordinates
-%       rotMatrix = rotation matrix describing the orientation of the
-%           surgical tip, 3x3 matrix
+%       eul = orientation of surgical instrument in roll, pitch yaw,
+%           measured in radians, 3x1 matrix
 
 
-function [surgicalTip_3D, rotMatrix] = findSurgicalTip(green_3D,blue_3D,red_3D, pivotOffset)
+function [surgicalTip_3D, eul] = findSurgicalTip(green_3D,blue_3D,red_3D, pivotOffset)
 
 %Determine point X between blue and green marker (37.5 mm away from green)
 g2b = blue_3D - green_3D;
@@ -38,5 +38,8 @@ A=orth([green_3D(:)-blue_3D(:),green_3D(:)-red_3D(:)]);
 B=[1 0 0; 0 1 0].';
 reg=absor(A,B,'doTrans',0);
 rotMatrix=reg.R;
+
+%Find orientation in roll, pitch, yaw
+eul = rotm2eul(rotMatrix);
 
 end

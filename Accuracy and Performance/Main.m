@@ -73,11 +73,11 @@ point3d_3 = zeros(3, nFramesLeft);
 trackedLocation_1 = zeros(3, nFramesLeft);
 trackedLocation_2 = zeros(3, nFramesLeft);
 trackedLocation_3 = zeros(3, nFramesLeft);
+eul = zeros(3, nFramesLeft);
 elapsed_1 = zeros(1, nFramesLeft);
 elapsed_2 = zeros(1, nFramesLeft);
 elapsed_3 = zeros(1, nFramesLeft);
 elapsed_4 = zeros(1, nFramesLeft);
-j = zeros(3);
 
 %Initialize variables
 pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
@@ -89,8 +89,8 @@ MotionNoise = [25, 10];
 measurementNoise = 10;
 
 %rot= zeros(3,nFramesLeft);
-[x_origin,y_origin,z_origin,rot,eul2] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
-[Robot,q0] = initializeMicroscope(x_origin,y_origin,z_origin,eul2);
+[x_origin,y_origin,z_origin,eul_init] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
+[Robot,q0] = initializeMicroscope(x_origin,y_origin,z_origin,eul_init);
 
 disp('Initialization Completed.');
 
@@ -99,6 +99,7 @@ elapsed_initialized = toc; %Assign toc to initialization time
 %% Marker tracking and robot movement
 close all;
 isTrackInitialized = 0;
+j = 0;
 
 %Initialize Video Player
 player = vision.DeployableVideoPlayer('Location',[10,100]);
@@ -146,12 +147,12 @@ for k = 1:frames_skip:nFramesLeft
                 point3d_2(:,k), initialEstimateError, MotionNoise,measurementNoise);
             kalmanFilter_3 = configureKalmanFilter('ConstantVelocity',...
                 point3d_3(:,k), initialEstimateError, MotionNoise,measurementNoise);
-            [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(point3d_1(:,k),point3d_2(:,k),point3d_3(:,k),pivotOffset);
+            [surgicalTip_3D(:, k), eul(:,k)] = findSurgicalTip(point3d_1(:,k),point3d_2(:,k),point3d_3(:,k),pivotOffset);
         else
             trackedLocation_1(:,k) = correct(kalmanFilter_1, point3d_1(:,k));
             trackedLocation_2(:,k) = correct(kalmanFilter_2, point3d_2(:,k));
             trackedLocation_3(:,k) = correct(kalmanFilter_3, point3d_3(:,k));
-            [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
+            [surgicalTip_3D(:, k), eul(:,k)] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
         end
         elapsed_2(k) = toc; %End find tip timer
 
@@ -170,7 +171,6 @@ for k = 1:frames_skip:nFramesLeft
         rgb = insertText(rgb,centroidLeft(3,:) - 50,['X: ' num2str(round(point3d_3(1,k)),'%d')...
             ' Y: ' num2str(round(point3d_3(2,k)),'%d') ' Z: ' num2str(round(point3d_3(3,k)))],'FontSize',18);
 
-        eul = rotm2eul(rotMatrix);
         player(rgb);
         writeVideo(v,rgb);
     end
@@ -188,7 +188,10 @@ for k = 1:frames_skip:nFramesLeft
         %Start control system timer
         tic;
         %Initiate control system
-        [q0,X,Y,Z,Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul);
+        [q0,X,Y,Z, Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul(:,k));
+        %Plotting
+        j = plot3(xMicroscope, yMicroscope, zMicroscope - 60, 'b.');
+        Robot.plot(Q(k*10 - 9:k*10, :));
         %Log control system accuracy
         Robot_Accuracy(:,k) = [X,Y,Z];
         %End control system timer
