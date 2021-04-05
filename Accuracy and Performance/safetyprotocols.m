@@ -25,7 +25,37 @@
 %           coordinates, with adjustments made if the input value did not
 %           meet the safety requirements of the robot.
 
-function [xMicroscope, yMicroscope, zMicroscope] = safetyProtocols(xMicroscope_In, yMicroscope_In, zMicroscope_In)
+function [xMicroscope, yMicroscope, zMicroscope, R_out, P_out, Y_out] = safetyProtocols(xMicroscope_In, yMicroscope_In, zMicroscope_In,eul)
+
+%Roll
+R = eul(3);
+if R<-0.43
+     R_out = -0.43;
+elseif R>0.43
+     R_out = 0.43;
+else
+     R_out = R;
+end
+
+%Pitch
+P = eul(1);
+if P<-0.43
+     P_out = -0.43;
+elseif P>0.43
+     P_out = 0.43;
+else
+     P_out = P;
+end
+
+%Yaw
+Y = eul(2);
+if Y<-0.43
+     Y_out = -0.43;
+elseif Y>0.43
+     Y_out = 0.43;
+else
+     Y_out = Y;
+end
 
 %Z from Tracking Output
 if xMicroscope_In<35
@@ -53,5 +83,7 @@ elseif zMicroscope_In>180
 else
      zMicroscope = zMicroscope_In;
 end
+
+
 
 end

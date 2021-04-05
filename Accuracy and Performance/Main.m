@@ -20,20 +20,18 @@ load("stereoParamsAccuracy.mat");
 %addpath(genpath('Trial 18-19'));
 %load("stereoParams18.mat");
 
-%readerLeft = VideoReader('myLeftTrialVert5cm.avi');
-%readerRight = VideoReader('myRightTrialVert5cm.avi');
+readerLeft = VideoReader('myLeftTrialVert5cm.avi');
+readerRight = VideoReader('myRightTrialVert5cm.avi');
 
 %readerLeft = VideoReader('myLeftTrialNormal8.avi');
 %readerRight = VideoReader('myRightTrialNormal8.avi');
 
-readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
-readerRight = VideoReader('myRightTrialHoriz5cm.avi');
+%readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
+%readerRight = VideoReader('myRightTrialHoriz5cm.avi');
 
 %readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
 %readerRight = VideoReader('myRightTrialHoriz10cm.avi');
 
-pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
-threshold = 245; % Threshold for Grayscale
 
 %Set up for skipping n frames
 nFramesLeft = readerLeft.NumFrames;
@@ -61,10 +59,8 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ...
     'MaximumBlobArea', 20000, ...
     'MaximumCount',3);
 
-[Robot,q0] = initializeMicroscope();
-
-
 %Initialize Arrays
+threshold = 245; % Threshold for Grayscale
 surgicalTip_3D = zeros(3, nFramesLeft);
 Robot_Accuracy = zeros(3, nFramesLeft);
 Q = zeros(10*nFramesLeft, 6);
@@ -95,8 +91,9 @@ MotionNoise = [25, 10];
 % MotionNoise = [25, 10, 10];
 measurementNoise = 10;
 
-[x_origin,y_origin,z_origin,rot] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
-[Robot,q0] = initializeMicroscope(x_origin,y_origin,z_origin,rot);
+%rot= zeros(3,nFramesLeft);
+[x_origin,y_origin,z_origin,rot,eul2] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
+[Robot,q0] = initializeMicroscope(x_origin,y_origin,z_origin,eul2);
 
 movement_1 = 1;
 movement_2 = 37;
@@ -107,7 +104,7 @@ disp('Initialization Completed.');
 elapsed_initialized = toc; %Assign toc to initialization time
 
 %% Marker tracking and robot movement
-
+close all;
 isTrackInitialized = 0;
 
 %Initialize Video Player
@@ -195,7 +192,7 @@ for k = 1:frames_skip:nFramesLeft
         rgb = insertText(rgb,centroidLeft(3,:) - 50,['X: ' num2str(round(point3d_3(1,k)),'%d')...
             ' Y: ' num2str(round(point3d_3(2,k)),'%d') ' Z: ' num2str(round(point3d_3(3,k)))],'FontSize',18);
 
-        eul = rotm2eul(rotMatrix)
+        eul = rotm2eul(rotMatrix);
         player(rgb);
         writeVideo(v,rgb);
     end
@@ -204,7 +201,7 @@ for k = 1:frames_skip:nFramesLeft
     tic;
 
     %Find location in microscope coordinates
-    [xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D(1, k), surgicalTip_3D(3, k), surgicalTip_3D(2, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
+    [xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D(1, k), surgicalTip_3D(2, k), surgicalTip_3D(3, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
 
     %End world2microscope timer
     elapsed_3(k) = toc;
@@ -213,7 +210,7 @@ for k = 1:frames_skip:nFramesLeft
         %Start control system timer
         tic;
         %Initiate control system
-        [q0,X,Y,Z,Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul, k);
+        [q0,X,Y,Z,Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul);
         %Log control system accuracy
         Robot_Accuracy(:,k) = [X,Y,Z];
         %End control system timer
