@@ -67,9 +67,6 @@ Q = zeros(10*nFramesLeft, 6);
 kalmanFilter_1 = [];
 kalmanFilter_2 = [];
 kalmanFilter_3 = [];
-kalmanFilter_temp_1 = [];
-kalmanFilter_temp_2 = [];
-kalmanFilter_temp_3 = [];
 point3d_1 = zeros(3, nFramesLeft);
 point3d_2 = zeros(3, nFramesLeft);
 point3d_3 = zeros(3, nFramesLeft);
@@ -94,10 +91,6 @@ measurementNoise = 10;
 %rot= zeros(3,nFramesLeft);
 [x_origin,y_origin,z_origin,rot,eul2] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
 [Robot,q0] = initializeMicroscope(x_origin,y_origin,z_origin,eul2);
-
-movement_1 = 1;
-movement_2 = 37;
-movement_3 = 81;
 
 disp('Initialization Completed.');
 
@@ -142,33 +135,18 @@ for k = 1:frames_skip:nFramesLeft
         trackedLocation_1(:,k) = trackedLocation_1(:,k-1);
         trackedLocation_2(:,k) = trackedLocation_2(:,k-1);
         trackedLocation_3(:,k) = trackedLocation_3(:,k-1);
-        %         trackedLocation_1(:,k) = predict(kalmanFilter_1);
-        %         trackedLocation_2(:,k) = predict(kalmanFilter_2);
-        %         trackedLocation_3(:,k) = predict(kalmanFilter_3);
         [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
         elapsed_2(k) = toc; %End find tip timer
     else
         [point3d_1(:,k),point3d_2(:,k), point3d_3(:,k)] = findWorldCoordinates(centroidLeft,centroidRight,stereoParams);
-        if k == movement_1 | k == movement_2 | k == movement_3
-            if k == movement_1
-                [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(point3d_1(:,k),point3d_2(:,k),point3d_3(:,k),pivotOffset);
-            else
-                kalmanFilter_temp_1 = kalmanFilter_1;
-                kalmanFilter_temp_2 = kalmanFilter_2;
-                kalmanFilter_temp_3 = kalmanFilter_3;
-                surgicalTip_3D(:, k) = surgicalTip_3D(:, k-1);
-            end
+        if k == 1
             kalmanFilter_1 = configureKalmanFilter('ConstantVelocity',...
                 point3d_1(:,k), initialEstimateError, MotionNoise,measurementNoise);
             kalmanFilter_2 = configureKalmanFilter('ConstantVelocity',...
                 point3d_2(:,k), initialEstimateError, MotionNoise,measurementNoise);
             kalmanFilter_3 = configureKalmanFilter('ConstantVelocity',...
                 point3d_3(:,k), initialEstimateError, MotionNoise,measurementNoise);
-        elseif (k > movement_2 && k < (movement_2 + 15)) | (k > movement_3 && k < (movement_3 + 15))
-            trackedLocation_1(:,k) = correct(kalmanFilter_temp_1, point3d_1(:,k));
-            trackedLocation_2(:,k) = correct(kalmanFilter_temp_2, point3d_2(:,k));
-            trackedLocation_3(:,k) = correct(kalmanFilter_temp_3, point3d_3(:,k));
-            [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
+            [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(point3d_1(:,k),point3d_2(:,k),point3d_3(:,k),pivotOffset);
         else
             trackedLocation_1(:,k) = correct(kalmanFilter_1, point3d_1(:,k));
             trackedLocation_2(:,k) = correct(kalmanFilter_2, point3d_2(:,k));
