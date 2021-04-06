@@ -97,7 +97,7 @@ disp('Initialization Completed.');
 elapsed_initialized = toc; %Assign toc to initialization time
 
 %% Marker tracking and robot movement
-close all;
+%close all;
 isTrackInitialized = 0;
 j = 0;
 
@@ -190,7 +190,13 @@ for k = 1:frames_skip:nFramesLeft
         %Initiate control system
         [q0,X,Y,Z, Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul(:,k));
         %Plotting
-        j = plot3(xMicroscope, yMicroscope, zMicroscope - 60, 'b.');
+        model = createpde;
+        g = importGeometry(model,'instument_STL_v1.stl');
+        rotate(g, 90,[0 0 0],[1 0 0]);
+        rotate(g, -90,[0 0 0],[0 0 1]);
+        translate(g, [-100 -10 -10])
+        translate(g, [xMicroscope, yMicroscope, zMicroscope - 60])
+        pdegplot(g)
         Robot.plot(Q(k*10 - 9:k*10, :));
         %Log control system accuracy
         Robot_Accuracy(:,k) = [X,Y,Z];
