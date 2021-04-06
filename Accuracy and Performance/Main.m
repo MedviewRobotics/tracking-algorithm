@@ -136,7 +136,7 @@ for k = 1:frames_skip:nFramesLeft
         trackedLocation_1(:,k) = trackedLocation_1(:,k-1);
         trackedLocation_2(:,k) = trackedLocation_2(:,k-1);
         trackedLocation_3(:,k) = trackedLocation_3(:,k-1);
-        [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
+        [surgicalTip_3D(:, k), eul(:,k)] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
         elapsed_2(k) = toc; %End find tip timer
     else
         [point3d_1(:,k),point3d_2(:,k), point3d_3(:,k)] = findWorldCoordinates(centroidLeft,centroidRight,stereoParams);
@@ -191,10 +191,10 @@ for k = 1:frames_skip:nFramesLeft
         [q0,X,Y,Z, Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul(:,k));
         %Plotting
         model = createpde;
-        g = importGeometry(model,'instument_STL_v1.stl');
-        rotate(g, 90,[0 0 0],[1 0 0]);
-        rotate(g, -90,[0 0 0],[0 0 1]);
-        translate(g, [-100 -10 -10])
+        g = importGeometry(model,'Instrument_Plotting_v9.stl');
+        rotate(g, 90,[0 0 0],[0 1 0]); %y-axis rotation
+        rotate(g, -90,[0 0 0],[0 0 1]); %z-axis rotation
+        rotate(g, -90,[0 0 0],[1 0 0]); %x-axis rotation
         translate(g, [xMicroscope, yMicroscope, zMicroscope - 60])
         pdegplot(g)
         Robot.plot(Q(k*10 - 9:k*10, :));
