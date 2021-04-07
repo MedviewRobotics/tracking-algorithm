@@ -38,16 +38,28 @@ hblob = vision.BlobAnalysis('AreaOutputPort', false, ...
 
 kalmanFilter = [];
 isTrackInitialized = false;
+
 initialEstimateError = [1 1 1]*1e5;
 MotionNoise = [25, 10, 10];
 measurementNoise = 1000;
+
+initialEstimateError = [0.5 0.5 0.5]*1e5;
+MotionNoise = [5, 5, 5];
+measurementNoise = 0.2;
+
 surgicalTip_3D = zeros(3, nFramesLeft);
 point3d_1 = zeros(3, nFramesLeft);
 point3d_2 = zeros(3, nFramesLeft);
 point3d_3 = zeros(3, nFramesLeft);
-trackedLocation_1 = zeros(3, nFramesLeft);
-trackedLocation_2 = zeros(3, nFramesLeft);
-trackedLocation_3 = zeros(3, nFramesLeft);
+red_marker = zeros(2, nFramesLeft);
+trackedLocation_1 = zeros(4, nFramesLeft);
+trackedLocation_2 = zeros(4, nFramesLeft);
+trackedLocation_3 = zeros(4, nFramesLeft);
+pcorr_1 = zeros (4, 4, nFramesLeft); 
+pcorr_2 = zeros(4, 4, nFramesLeft); 
+pcorr_3 = zeros(4, 4, nFramesLeft); 
+
+
 
 %% 2D Kalman
 
@@ -65,6 +77,8 @@ tracks = initializeTracks();
 %     tracks(i).bbox = [predictedCentroid, bbox(3:4)];
 % end
 % end
+frames_skip = 1;
+
 
 for k = 1:frames_skip:nFramesLeft
 
@@ -129,12 +143,23 @@ hold off
 figure;
 plot(1:nFramesLeft,pos(:,1))
 
-%% 3D Kalman
+%% 3D Kalman Extended
+
+trackedLocation_1 = zeros(4, nFramesLeft);
+trackedLocation_2 = zeros(4, nFramesLeft);
+trackedLocation_3 = zeros(4, nFramesLeft);
+pcorr_1 = zeros (4, 4, nFramesLeft); 
+pcorr_2 = zeros(4, 4, nFramesLeft); 
+pcorr_3 = zeros(4, 4, nFramesLeft); 
+
+kalmanFilter_1 = trackingUKF;
+kalmanFilter_2 = trackingUKF;
+kalmanFilter_3 = trackingUKF;
 
 frames_skip = 1;
 isTrackInitialized = 0;
 
-for k = 1:frames_skip:nFramesLeft
+for k = 1:frames_skip:235
     %Read Frames
     frameLeft = mov(k).readerLeft;
     frameRight = mov(k).readerRight;
@@ -147,7 +172,7 @@ for k = 1:frames_skip:nFramesLeft
         findCentroids(frameLeftGray,frameRightGray,threshold,hblob);
     
     %Validate position of centroids
-    if size(centroidLeft) ~= [3 3] | size(centroidRight) ~= [3 3] | k == 125
+    if size(centroidLeft) ~= [3 3] | size(centroidRight) ~= [3 3]
         warning(['Could not find marker(s) in frame: ', num2str(k)])
         point3d_1(:,k) = point3d_1(:,k-1);
         point3d_2(:,k) = point3d_2(:,k-1);
@@ -155,21 +180,61 @@ for k = 1:frames_skip:nFramesLeft
         trackedLocation_1(:,k) = trackedLocation_1(:,k-1);
         trackedLocation_2(:,k) = trackedLocation_2(:,k-1);
         trackedLocation_3(:,k) = trackedLocation_3(:,k-1);
+
         [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
         trackedLocation_1_1(:, k) = predict(kalmanFilter_1);
         trackedLocation_2_1(:, k) = predict(kalmanFilter_2);
         trackedLocation_3_1(:, k) = predict(kalmanFilter_3);
         label = 'Predicted';
+
+%         [surgicalTip_3D(:, k), eul(:,k)] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
+
     else
         [point3d_1(:,k),point3d_2(:,k), point3d_3(:,k)] = findWorldCoordinates(centroidLeft,centroidRight,stereoParams);
+        trackedLocation_1(:,k) = correct(kalmanFilter_1, point3d_1(:,k));
+        trackedLocation_2(:,k) = correct(kalmanFilter_2, point3d_2(:,k));
+        trackedLocation_3(:,k) = correct(kalmanFilter_3, point3d_3(:,k));
+%         [surgicalTip_3D(:, k), eul(:,k)] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
+    end
+end
+%% Plots
+
+figure
+subplot(211)
+plot(trackedLocation_1(1,50:235))
+subplot(212)
+plot(point3d_1(1,50:235))
+
+
+%% Ginette 2D Kalman Demo
+
+frames_skip = 1;
+isTrackInitialized = 0;
+
+for k = 60:frames_skip:135
+    %Read Frames
+    frameLeft = mov(k).readerLeft;
+    frameRight = mov(k).readerRight;
+    
+    %Initate preprocessing of frames
+    [frameLeftGray,frameRightGray] = preprocessFrames(frameLeft,frameRight);
+    
+    %Find centroids in left and right frames
+    [centroidLeft, bboxLeft, centroidRight, bboxRight] = ...
+        findCentroids(frameLeftGray,frameRightGray,threshold,hblob);
+    
+    %Validate position of centroids
+    if size(centroidLeft) == [2 2]
+        warning(['Could not find marker(s) in frame: ', num2str(k)])
+        red_marker(:, k) = red_marker(:, k-1);
+        trackedLocation_1(:,k) = trackedLocation_1(:,k-1);
+    else
+        red_marker(:, k) = centroidLeft(2, :);
         if isTrackInitialized == 0
             kalmanFilter_1 = configureKalmanFilter('ConstantAcceleration',...
-                point3d_1(:,k), initialEstimateError, MotionNoise,measurementNoise);
-            kalmanFilter_2 = configureKalmanFilter('ConstantAcceleration',...
-                point3d_2(:,k), initialEstimateError, MotionNoise,measurementNoise);
-            kalmanFilter_3 = configureKalmanFilter('ConstantAcceleration',...
-                point3d_3(:,k), initialEstimateError, MotionNoise,measurementNoise);
+                red_marker(:, k), initialEstimateError, MotionNoise, measurementNoise);
             isTrackInitialized = 1;
+
             [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(point3d_1(:,k),point3d_2(:,k),point3d_3(:,k),pivotOffset);
             label = ''; 
             circle_1 = zeros(0,3);
@@ -181,6 +246,10 @@ for k = 1:frames_skip:nFramesLeft
             trackedLocation_3(:,k) = correct(kalmanFilter_3, point3d_3(:,k));
             [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
             label = 'Correct';
+
+        else
+            trackedLocation_1(:,k) = correct(kalmanFilter_1, red_marker(:, k));
+
         end
         
         %Cost assignments for each marker based on detection and prediction
@@ -245,76 +314,139 @@ release(player)
 
 %% Accuracy table and plots 
 
+%% Plot frames from demo
+textLabel_1 = sprintf('Detected');
+textLabel_2 = sprintf('Corrected');
+
+frame1 = 65;
+frame2 = 75;
+frame3 = 95;
+frame4 = 110;
+frame5 = 120;
+frame6 = 129;
+
+%Frame 15
 figure
 subplot(321)
-plot(point3d_1(1, 5:235))
+imshow(mov(frame1).readerLeft)
+hold on
+plot(red_marker(1,frame1),red_marker(2,frame1),'b.')
+text(red_marker(1,frame1), red_marker(2,frame1)+ 2, textLabel_1, 'Color', 'b');
+plot(trackedLocation_1(1,frame1),trackedLocation_1(2,frame1),'m.')
+text(trackedLocation_1(1,frame1), trackedLocation_1(2,frame1)- 2, textLabel_2, 'Color', 'm');
+hold off
+subplot(322)
+imshow(mov(frame2).readerLeft)
+hold on
+plot(red_marker(1,frame2),red_marker(2,frame2),'b.')
+text(red_marker(1,frame2), red_marker(2,frame2)+ 2, textLabel_1, 'Color', 'b');
+plot(trackedLocation_1(1,frame2),trackedLocation_1(2,frame2),'m.')
+text(trackedLocation_1(1,frame2), trackedLocation_1(2,frame2)- 2, textLabel_2, 'Color', 'm');
+hold off
+subplot(323)
+imshow(mov(frame3).readerLeft)
+hold on
+plot(red_marker(1,frame3),red_marker(2,frame3),'b.')
+text(red_marker(1,frame3), red_marker(2,frame3)+ 2, textLabel_1, 'Color', 'b');
+plot(trackedLocation_1(1,frame3),trackedLocation_1(2,frame3),'m.')
+text(trackedLocation_1(1,frame3), trackedLocation_1(2,frame3)- 2, textLabel_2, 'Color', 'm');
+hold off
+subplot(324)
+imshow(mov(frame4).readerLeft)
+hold on
+plot(red_marker(1,frame4),red_marker(2,frame4),'b.')
+text(red_marker(1,frame4), red_marker(2,frame4)+ 2, textLabel_1, 'Color', 'b');
+plot(trackedLocation_1(1,frame4),trackedLocation_1(2,frame4),'m.')
+text(trackedLocation_1(1,frame4), trackedLocation_1(2,frame4)- 2, textLabel_2, 'Color', 'm');
+hold off
+subplot(325)
+imshow(mov(frame5).readerLeft)
+hold on
+plot(red_marker(1,frame5),red_marker(2,frame5),'b.')
+text(red_marker(1,frame5), red_marker(2,frame5)+ 2, textLabel_1, 'Color', 'b');
+plot(trackedLocation_1(1,frame5),trackedLocation_1(2,frame5),'m.')
+text(trackedLocation_1(1,frame5), trackedLocation_1(2,frame5)- 2, textLabel_2, 'Color', 'm');
+hold off
+subplot(326)
+imshow(mov(frame6).readerLeft)
+hold on
+plot(red_marker(1,frame6),red_marker(2,frame6),'b.')
+text(red_marker(1,frame6), red_marker(2,frame6)+ 2, textLabel_1, 'Color', 'b');
+plot(trackedLocation_1(1,frame6),trackedLocation_1(2,frame6),'m.')
+text(trackedLocation_1(1,frame6), trackedLocation_1(2,frame6)- 2, textLabel_2, 'Color', 'm');
+hold off
+
+%%
+
+figure
+subplot(321)
+plot(point3d_1(1, 52:150))
 title('Raw Green Marker X')
 subplot(322)
-plot(trackedLocation_1(1, 5:235))
+plot(trackedLocation_1(1, 52:150))
 title('Tracked Green Marker X')
 subplot(323)
-plot(point3d_1(2, 5:235))
+plot(point3d_1(2, 52:150))
 title('Raw Green Marker Y')
 subplot(324)
-plot(trackedLocation_1(2, 5:235))
+plot(trackedLocation_1(2, 52:150))
 title('Tracked Green Marker Y')
 subplot(325)
-plot(point3d_1(3, 5:235))
+plot(point3d_1(3, 52:150))
 title('Raw Green Marker Z')
 subplot(326)
-plot(trackedLocation_1(3, 5:235))
+plot(trackedLocation_1(3, 52:150))
 title('Tracked Green Marker Z')
 
 figure
 subplot(321)
-plot(point3d_2(1, 5:235))
+plot(point3d_2(1, 52:150))
 title('Raw Blue Marker X')
 subplot(322)
-plot(trackedLocation_2(1, 5:235))
+plot(trackedLocation_2(1, 52:150))
 title('Tracked Blue Marker X')
 subplot(323)
-plot(point3d_2(2, 5:235))
+plot(point3d_2(2, 52:150))
 title('Raw Blue Marker Y')
 subplot(324)
-plot(trackedLocation_2(2, 5:235))
+plot(trackedLocation_2(2, 52:150))
 title('Tracked Blue Marker Y')
 subplot(325)
-plot(point3d_2(3, 5:235))
+plot(point3d_2(3, 52:150))
 title('Raw Blue Marker Z')
 subplot(326)
-plot(trackedLocation_2(3, 5:235))
+plot(trackedLocation_2(3, 52:150))
 title('Tracked Blue Marker Z')
 
 figure
 subplot(321)
-plot(point3d_3(1, 5:235))
+plot(point3d_3(1, 52:150))
 title('Raw Red Marker X')
 subplot(322)
-plot(trackedLocation_3(1, 5:235))
+plot(trackedLocation_3(1, 52:150))
 title('Tracked Red Marker X')
 subplot(323)
-plot(point3d_3(2, 5:235))
+plot(point3d_3(2, 52:150))
 title('Raw Red Marker Y')
 subplot(324)
-plot(trackedLocation_3(2, 5:235))
+plot(trackedLocation_3(2, 52:150))
 title('Tracked Red Marker Y')
 subplot(325)
-plot(point3d_3(3, 5:235))
+plot(point3d_3(3, 52:150))
 title('Raw Red Marker Z')
 subplot(326)
-plot(trackedLocation_3(3, 5:235))
+plot(trackedLocation_3(3, 52:150))
 title('Tracked Red Marker Z')
-
 
 figure;
 subplot(311)
-plot(surgicalTip_3D(1,20:235));
+plot(surgicalTip_3D(1,52:150));
 title('Surgical Tip Position X');
 subplot(312)
-plot(surgicalTip_3D(2,20:235));
+plot(surgicalTip_3D(2,52:150));
 title('Surgical Tip Position Y');
 subplot(313)
-plot(surgicalTip_3D(3,20:235));
+plot(surgicalTip_3D(3,52:150));
 title('Surgical Tip Position Z');
 
 TAcc = trackingAccuracy(surgicalTip_3D(1,:),50,surgicalTip_3D(1,:))
@@ -350,4 +482,7 @@ end
  
   
   
-  
+% 
+% TAcc = trackingAccuracy(surgicalTip_3D(1,52:150),50,surgicalTip_3D(1,52:150))
+% disp(TAcc);
+
