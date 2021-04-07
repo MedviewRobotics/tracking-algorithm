@@ -20,18 +20,20 @@ load("stereoParamsAccuracy.mat");
 %addpath(genpath('Trial 18-19'));
 %load("stereoParams18.mat");
 
-readerLeft = VideoReader('myLeftTrialVert5cm.avi');
-readerRight = VideoReader('myRightTrialVert5cm.avi');
+% readerLeft = VideoReader('myLeftTrialNormalMovement.avi');
+% readerRight = VideoReader('myRightTrialNormalMovement.avi');
 
 %readerLeft = VideoReader('myLeftTrialNormal8.avi');
 %readerRight = VideoReader('myRightTrialNormal8.avi');
 
-%readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
-%readerRight = VideoReader('myRightTrialHoriz5cm.avi');
+% readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
+% readerRight = VideoReader('myRightTrialHoriz5cm.avi');
 
-%readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
-%readerRight = VideoReader('myRightTrialHoriz10cm.avi');
+% readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
+% readerRight = VideoReader('myRightTrialHoriz10cm.avi');
 
+readerLeft = VideoReader('myLeftTrialVert5cm.avi');
+readerRight = VideoReader('myRightTrialVert5cm.avi');
 
 %Set up for skipping n frames
 nFramesLeft = readerLeft.NumFrames;
@@ -97,7 +99,7 @@ disp('Initialization Completed.');
 elapsed_initialized = toc; %Assign toc to initialization time
 
 %% Marker tracking and robot movement
-%close all;
+close all;
 isTrackInitialized = 0;
 j = 0;
 
@@ -130,13 +132,17 @@ for k = 1:frames_skip:nFramesLeft
     %Validate position of centroids
     if size(centroidLeft) ~= [3 3] | size(centroidRight) ~= [3 3]
         warning(['Could not detect marker(s) in frame: ', num2str(k), ', using predicted locations'])
-        point3d_1(:,k) = point3d_1(:,k-1);
-        point3d_2(:,k) = point3d_2(:,k-1);
-        point3d_3(:,k) = point3d_3(:,k-1);
-        trackedLocation_1(:,k) = trackedLocation_1(:,k-1);
-        trackedLocation_2(:,k) = trackedLocation_2(:,k-1);
-        trackedLocation_3(:,k) = trackedLocation_3(:,k-1);
-        [surgicalTip_3D(:, k), eul(:,k)] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
+        if k == 1
+            pause(1);
+        else
+            point3d_1(:,k) = point3d_1(:,k-1);
+            point3d_2(:,k) = point3d_2(:,k-1);
+            point3d_3(:,k) = point3d_3(:,k-1);
+            trackedLocation_1(:,k) = trackedLocation_1(:,k-1);
+            trackedLocation_2(:,k) = trackedLocation_2(:,k-1);
+            trackedLocation_3(:,k) = trackedLocation_3(:,k-1);
+            [surgicalTip_3D(:, k)] = surgicalTip_3D(:, k-1);
+        end
         elapsed_2(k) = toc; %End find tip timer
     else
         [point3d_1(:,k),point3d_2(:,k), point3d_3(:,k)] = findWorldCoordinates(centroidLeft,centroidRight,stereoParams);
@@ -147,18 +153,18 @@ for k = 1:frames_skip:nFramesLeft
                 point3d_2(:,k), initialEstimateError, MotionNoise,measurementNoise);
             kalmanFilter_3 = configureKalmanFilter('ConstantVelocity',...
                 point3d_3(:,k), initialEstimateError, MotionNoise,measurementNoise);
-            [surgicalTip_3D(:, k), eul(:,k)] = findSurgicalTip(point3d_1(:,k),point3d_2(:,k),point3d_3(:,k),pivotOffset);
+            [surgicalTip_3D(:, k), eul(:,k), normal] = findSurgicalTip(point3d_1(:,k),point3d_2(:,k),point3d_3(:,k),pivotOffset);
         else
             trackedLocation_1(:,k) = correct(kalmanFilter_1, point3d_1(:,k));
             trackedLocation_2(:,k) = correct(kalmanFilter_2, point3d_2(:,k));
             trackedLocation_3(:,k) = correct(kalmanFilter_3, point3d_3(:,k));
-            [surgicalTip_3D(:, k), eul(:,k)] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
+            [surgicalTip_3D(:, k), eul(:,k), normal] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
         end
         elapsed_2(k) = toc; %End find tip timer
 
         %Plotting in video player
         rgb = insertShape(frameLeft,'rectangle',bboxLeft(1,:),'Color','black',...
-            'LineWidth',3);
+             'LineWidth',3);
         rgb = insertShape(rgb,'rectangle',bboxLeft(2,:),'Color','black',...
             'LineWidth',3);
         rgb = insertShape(rgb,'rectangle',bboxLeft(3,:),'Color','black',...
@@ -178,8 +184,12 @@ for k = 1:frames_skip:nFramesLeft
     %Start world2microscope timer
     tic;
 
-    %Find location in microscope coordinates
-    [xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(surgicalTip_3D(1, k), surgicalTip_3D(2, k), surgicalTip_3D(3, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
+    %Find location of microscope
+    locationMicroscope = surgicalTip_3D(:,k) + normal(:)*60;
+    [xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(locationMicroscope(1), locationMicroscope(2), locationMicroscope(3), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
+    
+    %Find location of tip in microscope coordinates
+    [xTip, yTip, zTip] = world2Microscope_Accuracy(surgicalTip_3D(1, k), surgicalTip_3D(2, k), surgicalTip_3D(3, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
 
     %End world2microscope timer
     elapsed_3(k) = toc;
@@ -190,13 +200,14 @@ for k = 1:frames_skip:nFramesLeft
         %Initiate control system
         [q0,X,Y,Z, Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul(:,k));
         %Plotting
-        model = createpde;
-        g = importGeometry(model,'Instrument_Plotting_v9.stl');
-        rotate(g, 90,[0 0 0],[0 1 0]); %y-axis rotation
-        rotate(g, -90,[0 0 0],[0 0 1]); %z-axis rotation
-        rotate(g, -90,[0 0 0],[1 0 0]); %x-axis rotation
-        translate(g, [xMicroscope, yMicroscope, zMicroscope - 60])
-        pdegplot(g)
+%         model = createpde;
+%         g = importGeometry(model,'Instrument_Plotting_v9.stl');
+%         rotate(g, 90,[0 0 0],[0 1 0]); %y-axis rotation
+%         rotate(g, -90,[0 0 0],[0 0 1]); %z-axis rotation
+%         rotate(g, -90,[0 0 0],[1 0 0]); %x-axis rotation
+%         translate(g, [xTip, yTip, zTip]);
+%         pdegplot(g)
+        j = plot3(xTip, yTip, zTip, '.b');
         Robot.plot(Q(k*10 - 9:k*10, :));
         %Log control system accuracy
         Robot_Accuracy(:,k) = [X,Y,Z];
@@ -314,13 +325,15 @@ subplot(326)
 plot(trackedLocation_3(3, lower:upper))
 title('Tracked Red Marker Z')
 
-figure;
-subplot(311)
-plot(surgicalTip_3D(1,lower:upper));
-title('Surgical Tip Position X');
-subplot(312)
-plot(surgicalTip_3D(2,lower:upper));
-title('Surgical Tip Position Y');
-subplot(313)
-plot(surgicalTip_3D(3,lower:upper));
-title('Surgical Tip Position Z');
+%% Ginette orientation mess-around
+
+locationMicroscope = surgicalTip_3D(:,k) + normal(:)*60;
+
+figure
+plot3(point3d_1(1,k), point3d_1(2,k), point3d_1(3,k), '.g');
+hold on
+plot3(point3d_2(1,k), point3d_2(2,k), point3d_2(3,k), '.r');
+plot3(point3d_3(1,k), point3d_3(2,k), point3d_3(3,k), '.b');
+plot3(surgicalTip_3D(1,k), surgicalTip_3D(2,k), surgicalTip_3D(3,k), '.m');
+plot3(locationMicroscope(1), locationMicroscope(2), locationMicroscope(3), '.c');
+hold off

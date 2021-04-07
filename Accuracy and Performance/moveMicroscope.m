@@ -44,20 +44,6 @@ qf = AT03.ikine(T_start,'q0',q0);
 %move to new pose
 [Q,QD,QDD] = jtraj(q0, qf, 10);
 
-% if j == 0
-%     AT03.plot(Q);
-%     hold on
-%     j = plot3(x, y, z - 60, 'b.');
-%     hold off
-% else
-%     delete(j);
-%     clear j;
-%     AT03.plot(Q);
-%     hold on
-%     j = plot3(x, y, z - 60, 'b.');
-%     hold off
-% end
-
 %AT03.plot3d(Q,'view','y','path','C:\Users\bluet\Documents\Capstone_New\OTS\tracking-algorithm\Accuracy and Performance\robot\data\ARTE4','floorlevel',-175,'base');
 
 %New pose is now the old/start pose
