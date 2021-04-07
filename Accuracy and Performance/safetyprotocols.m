@@ -27,37 +27,37 @@
 
 function [xMicroscope, yMicroscope, zMicroscope, R_out, P_out, Y_out] = safetyProtocols(xMicroscope_In, yMicroscope_In, zMicroscope_In,eul)
 
-%Roll
-R = eul(3);
-if R<-0.43
-     R_out = -0.43;
-elseif R>0.43
-     R_out = 0.43;
-else
-     R_out = R;
-end
+%Roll...About the Z axis (Tracking Y) (Rotate the end effector in XY PLane
+R = eul(2);
+ if R<-0.6
+      R_out = -0.6;
+ elseif R>0.6
+     R_out = 0.6;
+ else
+      R_out = R;
+ end
 
-%Pitch
-P = eul(1);
-if P<-0.43
-     P_out = -0.43;
-elseif P>0.43
-     P_out = 0.43;
-else
-     P_out = P;
-end
+%Pitch...Robot X Axis (Tracking Z)
+P = eul(3);
+ if P<2
+      P_out = 2;
+ elseif P>3
+      P_out = 3;
+ else
+      P_out = P;
+ end
 
-%Yaw
-Y = eul(2);
-if Y<-0.43
-     Y_out = -0.43;
-elseif Y>0.43
-     Y_out = 0.43;
-else
-     Y_out = Y;
-end
+%Yaw..%Robot Yaw in Robot Y axis is from Tracking X
+Y = eul(1);
+ if Y<-0.6
+      Y_out = -0.6;
+ elseif Y>0.6
+      Y_out = 0.6;
+ else
+      Y_out = Y;
+ end
 
-%Z from Tracking Output
+%Z from Tracking Output 3 --> 1
 if xMicroscope_In<35
      xMicroscope = 35;
 elseif xMicroscope_In>115
@@ -66,7 +66,7 @@ else
      xMicroscope = xMicroscope_In;
 end
 
-%X from Tracking Output
+%X from Tracking Output 1 --> 2
 if yMicroscope_In<-70
      yMicroscope = -70;
 elseif yMicroscope_In>70
@@ -75,7 +75,7 @@ else
      yMicroscope = yMicroscope_In;
 end
 
-%Y from Tracking Output
+%Y from Tracking Output 2 --> 3
 if zMicroscope_In<90
      zMicroscope = 90;
 elseif zMicroscope_In>180
