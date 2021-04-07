@@ -200,13 +200,13 @@ for k = 1:frames_skip:nFramesLeft
         %Initiate control system
         [q0,X,Y,Z, Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul(:,k));
         %Plotting
-%         model = createpde;
-%         g = importGeometry(model,'Instrument_Plotting_v9.stl');
-%         rotate(g, 90,[0 0 0],[0 1 0]); %y-axis rotation
-%         rotate(g, -90,[0 0 0],[0 0 1]); %z-axis rotation
-%         rotate(g, -90,[0 0 0],[1 0 0]); %x-axis rotation
-%         translate(g, [xTip, yTip, zTip]);
-%         pdegplot(g)
+%          model = createpde;
+%          g = importGeometry(model,'Instrument_Plotting_v9.stl');
+%          rotate(g, 90,[0 0 0],[0 1 0]); %y-axis rotation
+%          rotate(g, -90,[0 0 0],[0 0 1]); %z-axis rotation
+%          rotate(g, -90,[0 0 0],[1 0 0]); %x-axis rotation
+%          translate(g, [xTip, yTip, zTip]);
+%          pdegplot(g)
         j = plot3(xTip, yTip, zTip, '.b');
         Robot.plot(Q(k*10 - 9:k*10, :));
         %Log control system accuracy
