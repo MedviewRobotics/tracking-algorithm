@@ -46,9 +46,14 @@ point3d_1 = zeros(3, nFramesLeft);
 point3d_2 = zeros(3, nFramesLeft);
 point3d_3 = zeros(3, nFramesLeft);
 red_marker = zeros(2, nFramesLeft);
-trackedLocation_1 = zeros(2, nFramesLeft);
-trackedLocation_2 = zeros(3, nFramesLeft);
-trackedLocation_3 = zeros(3, nFramesLeft);
+trackedLocation_1 = zeros(4, nFramesLeft);
+trackedLocation_2 = zeros(4, nFramesLeft);
+trackedLocation_3 = zeros(4, nFramesLeft);
+pcorr_1 = zeros (4, 4, nFramesLeft); 
+pcorr_2 = zeros(4, 4, nFramesLeft); 
+pcorr_3 = zeros(4, 4, nFramesLeft); 
+
+
 
 %% 2D Kalman
 
@@ -117,12 +122,23 @@ hold off
 figure;
 plot(1:nFramesLeft,pos(:,1))
 
-%% 3D Kalman
+%% 3D Kalman Extended
+
+trackedLocation_1 = zeros(4, nFramesLeft);
+trackedLocation_2 = zeros(4, nFramesLeft);
+trackedLocation_3 = zeros(4, nFramesLeft);
+pcorr_1 = zeros (4, 4, nFramesLeft); 
+pcorr_2 = zeros(4, 4, nFramesLeft); 
+pcorr_3 = zeros(4, 4, nFramesLeft); 
+
+kalmanFilter_1 = trackingUKF;
+kalmanFilter_2 = trackingUKF;
+kalmanFilter_3 = trackingUKF;
 
 frames_skip = 1;
 isTrackInitialized = 0;
 
-for k = 50:frames_skip:150
+for k = 1:frames_skip:235
     %Read Frames
     frameLeft = mov(k).readerLeft;
     frameRight = mov(k).readerRight;
@@ -135,7 +151,7 @@ for k = 50:frames_skip:150
         findCentroids(frameLeftGray,frameRightGray,threshold,hblob);
     
     %Validate position of centroids
-    if size(centroidLeft) ~= [3 3] | size(centroidRight) ~= [3 3] | k == 125
+    if size(centroidLeft) ~= [3 3] | size(centroidRight) ~= [3 3]
         warning(['Could not find marker(s) in frame: ', num2str(k)])
         point3d_1(:,k) = point3d_1(:,k-1);
         point3d_2(:,k) = point3d_2(:,k-1);
@@ -143,26 +159,23 @@ for k = 50:frames_skip:150
         trackedLocation_1(:,k) = trackedLocation_1(:,k-1);
         trackedLocation_2(:,k) = trackedLocation_2(:,k-1);
         trackedLocation_3(:,k) = trackedLocation_3(:,k-1);
-        [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
+%         [surgicalTip_3D(:, k), eul(:,k)] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
     else
         [point3d_1(:,k),point3d_2(:,k), point3d_3(:,k)] = findWorldCoordinates(centroidLeft,centroidRight,stereoParams);
-        if isTrackInitialized == 0
-            kalmanFilter_1 = configureKalmanFilter('ConstantVelocity',...
-                point3d_1(:,k), initialEstimateError, MotionNoise,measurementNoise);
-            kalmanFilter_2 = configureKalmanFilter('ConstantVelocity',...
-                point3d_2(:,k), initialEstimateError, MotionNoise,measurementNoise);
-            kalmanFilter_3 = configureKalmanFilter('ConstantVelocity',...
-                point3d_3(:,k), initialEstimateError, MotionNoise,measurementNoise);
-            isTrackInitialized = 1;
-            [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(point3d_1(:,k),point3d_2(:,k),point3d_3(:,k),pivotOffset);
-        else
-            trackedLocation_1(:,k) = correct(kalmanFilter_1, point3d_1(:,k));
-            trackedLocation_2(:,k) = correct(kalmanFilter_2, point3d_2(:,k));
-            trackedLocation_3(:,k) = correct(kalmanFilter_3, point3d_3(:,k));
-            [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
-        end
+        trackedLocation_1(:,k) = correct(kalmanFilter_1, point3d_1(:,k));
+        trackedLocation_2(:,k) = correct(kalmanFilter_2, point3d_2(:,k));
+        trackedLocation_3(:,k) = correct(kalmanFilter_3, point3d_3(:,k));
+%         [surgicalTip_3D(:, k), eul(:,k)] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
     end
 end
+%% Plots
+
+figure
+subplot(211)
+plot(trackedLocation_1(1,50:235))
+subplot(212)
+plot(point3d_1(1,50:235))
+
 
 %% Ginette 2D Kalman Demo
 
