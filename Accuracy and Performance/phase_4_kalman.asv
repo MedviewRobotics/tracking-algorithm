@@ -47,7 +47,7 @@ trackedLocation_1 = zeros(3, nFramesLeft);
 trackedLocation_2 = zeros(3, nFramesLeft);
 trackedLocation_3 = zeros(3, nFramesLeft);
 
-%%
+%% Tracking Video
 
 isTrackInitialized = 0;
 trackedLocation_1 = zeros(nFramesLeft,2);
@@ -138,22 +138,47 @@ end
 release(player);
 close(v); 
 
+%%
+%Tracked coordinates over image 
 figure;
 imshow(frameLeft)
 hold on
 plot(trackedLocation_1(2:end,1),trackedLocation_1(2:end,2),'go-','LineWidth',1)
 plot(trackedLocation_2(2:end,1),trackedLocation_2(2:end,2),'ro-','LineWidth',1)
 plot(trackedLocation_3(2:end,1),trackedLocation_3(2:end,2),'bo-','LineWidth',1)
-
 hold off
+title('Movement of markers throughout all frames using Kalman')
+
 
 figure;
 hold on
-plot(2:nFramesLeft,trackedLocation_1(2:end,1))
-plot(2:nFramesLeft,trackedLocation_2(2:end,1))
-plot(2:nFramesLeft,trackedLocation_3(2:end,1))
+plot(2:nFramesLeft,trackedLocation_1(2:end,1),'Color','g')
+plot(2:nFramesLeft,trackedLocation_2(2:end,1),'Color','r')
+plot(2:nFramesLeft,trackedLocation_3(2:end,1),'Color','b')
 hold off
-legend('')
+legend('Green Marker','Red Marker','Blue Marker')
+title('Movement of markers in the x direction in pixel coordinates')
+
+
+%% 
+
+
+circle_1 = [trackedLocation_1(63,:) 5];
+circle_2 = [trackedLocation_2(63,:) 5];
+circle_3 = [trackedLocation_3(63,:) 5];
+
+label = 'Predicted';
+
+colorImage = insertObjectAnnotation(t,'circle',...
+    circle_1,label,'Color','green');
+colorImage = insertObjectAnnotation(colorImage,'circle',...
+    circle_2,label,'Color','red');
+colorImage = insertObjectAnnotation(colorImage,'circle',...
+    circle_3,label,'Color','blue');
+
+figure;imshow(colorImage)
+
+
 
 
 
