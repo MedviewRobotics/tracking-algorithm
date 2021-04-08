@@ -187,13 +187,12 @@ for k = 1:frames_skip:nFramesLeft
     tic;
 
     %Find location of microscope
-    %locationMicroscope = [surgicalTip_3D(1,k)-10*normal(1),surgicalTip_3D(2,k)-10*normal(2),surgicalTip_3D(3,k) - 60*normal(3)];
-    locationMicroscope = [surgicalTip_3D(1,k) - abs(50*normal(2)),surgicalTip_3D(2,k)-20,surgicalTip_3D(3,k)-abs(150*normal(1))];
-    %RECALL: X is Y in PLot, Z is X in PLot, Y is neg(Z) in Plot
+    locationMicroscope = surgicalTip_3D(:,k) - normal(:)*50;
     [xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(locationMicroscope(1), locationMicroscope(2), locationMicroscope(3), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
     
     %Find location of tip in microscope coordinates
     [xTip, yTip, zTip] = world2Microscope_Accuracy(surgicalTip_3D(1, k), surgicalTip_3D(2, k), surgicalTip_3D(3, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
+    [x, y, z, R, P, Y] = safetyprotocols(input_x, input_y, input_z, eul); 
 
     %End world2microscope timer
     elapsed_3(k) = toc;
@@ -206,10 +205,10 @@ for k = 1:frames_skip:nFramesLeft
         %Plotting
         model = createpde;
         g = importGeometry(model,'Instrument_Plotting_v9.stl');
-        rotate(g, 90,[0 0 0],[0 0 1]); %z-axis rotation to bring to 0 0 0
-        rotate(g, rad2deg(eul(3,k)),[0 0 0],[1 0 0]); %x-axis rotation
-        rotate(g, rad2deg(eul(1,k)),[0 0 0],[0 1 0]); %y-axis rotation
-        rotate(g, rad2deg(eul(2,k)),[0 0 0],[0 0 1]); %z-axis rotation
+        rotate(g, 0,[0 0 0],[0 0 1]); %z-axis rotation to bring to 0 0 0
+        rotate(g, rad2deg(eul(1,k)),[0 0 0],[1 0 0]); %x-axis rotation
+        rotate(g, rad2deg(eul(2,k)),[0 0 0],[0 1 0]); %y-axis rotation
+        rotate(g, rad2deg(eul(3,k)),[0 0 0],[0 0 1]); %z-axis rotation
         translate(g, [xTip, yTip, zTip]);
         pdegplot(g)
         Robot.plot(Q(k*10 - 9:k*10, :));
