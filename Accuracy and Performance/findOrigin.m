@@ -58,7 +58,7 @@ for k = 1:frames_skip:nFramesLeft
             trackedLocation_2(:,k) = correct(kalmanFilter_2, point3d_2(:,k));
             trackedLocation_3(:,k) = correct(kalmanFilter_3, point3d_3(:,k));
             [surgicalTip_3D(:, k), eul(:,k), normal] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
-            locationMicroscope(:,k) = surgicalTip_3D(:,k) + normal(:)*60;
+            locationMicroscope(:,k) = surgicalTip_3D(:,k) - normal(:)*60;
         end
     end
 end
@@ -66,7 +66,7 @@ end
 x_origin = mean(locationMicroscope(1, 15:nFramesLeft));
 temp = -mean(max(locationMicroscope(2, 15:220))); %,max(surgicalTip_3D_norm(2, 50:100))));
 y_origin = temp - 100;
-z_origin = mean(locationMicroscope(3, 15:nFramesLeft)) - 75; %75 is the center depth/works with robot/for back and forth
+z_origin = mean(locationMicroscope(3, 15:nFramesLeft)); %75 is the center depth/works with robot/for back and forth
 eul = eul(:,5);
 end
 

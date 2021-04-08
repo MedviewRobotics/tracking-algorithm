@@ -21,7 +21,7 @@
 %       Y = ?
 %       Z = ?
 
-function [newq0,x,y,z,Q] = moveMicroscope(input_x,input_y,input_z,q0,AT03, eul)
+function [newq0,x,y,z,R,P,Y,Q] = moveMicroscope(input_x,input_y,input_z,q0,AT03, eul)
 
 %while i<20
 
