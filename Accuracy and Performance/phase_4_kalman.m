@@ -4,8 +4,8 @@ load("stereoParamsAccuracy.mat");
 pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
 threshold = 245; % Threshold for Grayscale
 
-readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
-readerRight = VideoReader('myRightTrialHoriz5cm.avi');
+readerLeft = VideoReader('myLeftTrialVert5cm.avi');
+readerRight = VideoReader('myRightTrialVert5cm.avi');
 
 player = vision.DeployableVideoPlayer('Location',[10,100]);
 
@@ -77,9 +77,9 @@ frameRight = mov(k).readerRight;
     %Validate position of centroids
     if size(centroidLeft) ~= [3 3] | size(centroidRight) ~= [3 3] | k == 125
 %        warning(['Could not find marker(s) in frame: ', num2str(k)])
-%         trackedLocation_1(:,k) = trackedLocation_1(:,k-1);
-%         trackedLocation_2(:,k) = trackedLocation_2(:,k-1);
-%         trackedLocation_3(:,k) = trackedLocation_3(:,k-1);
+%         trackedLocation_1(k,:) = trackedLocation_1(k-1,:);
+%         trackedLocation_2(k,:) = trackedLocation_2(k-1,:);
+%         trackedLocation_3(k,:) = trackedLocation_3(k-1,:);
 %        [surgicalTip_3D(:, k), rotMatrix] = findSurgicalTip(trackedLocation_1(:,k),trackedLocation_2(:,k),trackedLocation_3(:,k),pivotOffset);
         trackedLocation_1(k,:) = predict(kalmanFilter_1);
         trackedLocation_2(k,:) = predict(kalmanFilter_2);
@@ -152,12 +152,16 @@ title('Movement of markers throughout all frames using Kalman')
 
 figure;
 hold on
-plot(2:nFramesLeft,trackedLocation_1(2:end,1))
-plot(2:nFramesLeft,trackedLocation_2(2:end,1))
-plot(2:nFramesLeft,trackedLocation_3(2:end,1))
+plot(2:nFramesLeft,trackedLocation_1(2:end,1),'Color','g')
+plot(2:nFramesLeft,trackedLocation_2(2:end,1),'Color','r')
+plot(2:nFramesLeft,trackedLocation_3(2:end,1),'Color','b')
 hold off
 legend('Green Marker','Red Marker','Blue Marker')
 title('Movement of markers in the x direction in pixel coordinates')
+
+
+
+
 
 
 
