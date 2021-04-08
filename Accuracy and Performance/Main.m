@@ -142,6 +142,7 @@ for k = 1:frames_skip:nFramesLeft
             trackedLocation_2(:,k) = trackedLocation_2(:,k-1);
             trackedLocation_3(:,k) = trackedLocation_3(:,k-1);
             [surgicalTip_3D(:, k)] = surgicalTip_3D(:, k-1);
+            eul(:,k) = eul(:, k-1);
         end
         elapsed_2(k) = toc; %End find tip timer
     else
@@ -185,7 +186,7 @@ for k = 1:frames_skip:nFramesLeft
     tic;
 
     %Find location of microscope
-    locationMicroscope = surgicalTip_3D(:,k) + normal(:)*60;
+    locationMicroscope = surgicalTip_3D(:,k) - normal(:)*50;
     [xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(locationMicroscope(1), locationMicroscope(2), locationMicroscope(3), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
     
     %Find location of tip in microscope coordinates
@@ -200,14 +201,15 @@ for k = 1:frames_skip:nFramesLeft
         %Initiate control system
         [q0,X,Y,Z, Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul(:,k));
         %Plotting
-%          model = createpde;
-%          g = importGeometry(model,'Instrument_Plotting_v9.stl');
-%          rotate(g, 90,[0 0 0],[0 1 0]); %y-axis rotation
-%          rotate(g, -90,[0 0 0],[0 0 1]); %z-axis rotation
-%          rotate(g, -90,[0 0 0],[1 0 0]); %x-axis rotation
-%          translate(g, [xTip, yTip, zTip]);
-%          pdegplot(g)
-        j = plot3(xTip, yTip, zTip, '.b');
+         model = createpde;
+         g = importGeometry(model,'Instrument_Plotting_v9.stl');
+         rotate(g, 90,[0 0 0],[0 0 1]); %z-axis rotation to bring to 0 0 0
+         rotate(g, rad2deg(eul(3,k)),[0 0 0],[1 0 0]); %x-axis rotation         
+         rotate(g, rad2deg(eul(1,k)),[0 0 0],[0 1 0]); %y-axis rotation
+         rotate(g, rad2deg(eul(2,k)),[0 0 0],[0 0 1]); %x-axis rotation
+         translate(g, [xTip, yTip, zTip]);
+         pdegplot(g)
+       % j = plot3(xTip, yTip, zTip, '.b');
         Robot.plot(Q(k*10 - 9:k*10, :));
         %Log control system accuracy
         Robot_Accuracy(:,k) = [X,Y,Z];
@@ -238,7 +240,7 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 
 %% Output Accuracy Metrics
 %Vert 50
-TAcc = trackingAccuracy(surgicalTip_3D(2,:),50,Robot_Accuracy(3,:))
+TAcc = trackingAccuracy(surgicalTip_3D(1,:),50,Robot_Accuracy(2,:))
 disp(TAcc);
 
 %% Accuracy plots
