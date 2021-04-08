@@ -1,6 +1,6 @@
 function [trackedLocation_1,trackedLocation_2,trackedLocation_3,surgicalTip_3D,elapsed_2] = ...
-    kalmanFilters(centroidLeft,centroidRight,k,nFramesLeft,pivotOffset,stereoParams,trackedLocation_1,...
-trackedLocation_2,trackedLocation_3,surgicalTip_3D)
+    kalmanFilters(centroidLeft,centroidRight,k,nFramesLeft,pivotOffset,stereoParams,trackedLocation_1,
+)
 
 
 elapsed_2 = zeros(1, nFramesLeft);
