@@ -38,7 +38,7 @@ R = eul(2);
  end
 
 %Pitch...Robot X Axis (Tracking Z)
-P = eul(3);
+P = eul(3); %3
  if P<2
       P_out = 2;
  elseif P>3
@@ -48,7 +48,7 @@ P = eul(3);
  end
 
 %Yaw..%Robot Yaw in Robot Y axis is from Tracking X
-Y = eul(1);
+Y = eul(1); %1
  if Y<-0.6
       Y_out = -0.6;
  elseif Y>0.6
