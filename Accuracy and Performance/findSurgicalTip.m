@@ -1,9 +1,10 @@
 %FINDSURGICALTIP determines the location and orientation of the surgical
 %instrument.
 %
-%   [surgicalTip_3D, rotMatrix] = FINDSURGICALTIP(green_3D,blue_3D,red_3D, pivotOffset)
-%   returns the position of the surgical tip and the orientation of the 
-%   surgical instrument 3 x 3 Matrix
+%   [surgicalTip_3D, eul, normal] = FINDSURGICALTIP(green_3D, blue_3D, red_3D, pivotOffset)
+%   returns the position of the surgical tip, the orientation of the 
+%   surgical instrument, and the normal unit vector to the plane formed by
+%   the surgical markers.
 %
 %   INPUTS:
 %       green_3D = 3D location of the green marker in world coordinates, 3x1 matrix
@@ -14,9 +15,11 @@
 %
 %   OUTPUTS:
 %       surgicalTip_3D = 3D position of the surgical tip in world
-%           coordinates
-%       eul = orientation of surgical instrument in roll, pitch yaw,
+%           coordinates, 3x1 matrix
+%       eul = orientation of surgical instrument roll, pitch, and yaw,
 %           measured in radians, 3x1 matrix
+%       normal = unit vector that represents the normal to the plane made
+%           by the three surgical markers, 3x1 matrix
 
 
 function [surgicalTip_3D, eul, normal] = findSurgicalTip(green_3D,red_3D,blue_3D, pivotOffset)

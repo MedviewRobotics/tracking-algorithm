@@ -95,12 +95,18 @@ measurementNoise = 10;
 [x_origin,y_origin,z_origin,eul_init] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
 [Robot,q0] = initializeMicroscope(x_origin,y_origin,z_origin,eul_init);
 
+model = createpde;
+h = importGeometry(model,'brain(100percent).stl');
+rotate(h, -90,[0 0 0],[1 0 0]); %x-axis rotation
+rotate(h, -90,[0 0 0],[0 0 1]); %z-axis rotation
+translate(h, [60, 85,95]);
+pdegplot(h)
+
 disp('Initialization Completed.');
 
 elapsed_initialized = toc; %Assign toc to initialization time
 
 %% Marker tracking and robot movement
-close all;
 isTrackInitialized = 0;
 j = 0;
 
@@ -177,7 +183,6 @@ for k = 1:frames_skip:nFramesLeft
     tic;
 
     %Find location of microscope
-    %locationMicroscope = [surgicalTip_3D(1,k)-10*normal(1),surgicalTip_3D(2,k)-10*normal(2),surgicalTip_3D(3,k) - 60*normal(3)];
     locationMicroscope = [surgicalTip_3D(1,k) - abs(50*normal(2)),surgicalTip_3D(2,k)-20,surgicalTip_3D(3,k)-abs(150*normal(1))];
     %RECALL: X is Y in PLot, Z is X in PLot, Y is neg(Z) in Plot
     [xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(locationMicroscope(1), locationMicroscope(2), locationMicroscope(3), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
@@ -201,9 +206,12 @@ for k = 1:frames_skip:nFramesLeft
         rotate(g, rad2deg(eul(1,k)),[0 0 0],[0 1 0]); %y-axis rotation
         rotate(g, rad2deg(eul(2,k)),[0 0 0],[0 0 1]); %z-axis rotation
         translate(g, [xTip, yTip, zTip]);
+        pdegplot(h)
+        hold on
         pdegplot(g)
-        Robot.plot3d(Q(k*10 - 9:k*10, :),'view','y','path','C:\Users\bluet\Documents\Capstone_New\OTS\tracking-algorithm\Accuracy and Performance\robot\data\ARTE4','floorlevel',-175,'base');
-        %Robot.plot(Q(k*10 - 9:k*10, :));
+        %Robot.plot3d(Q(k*10 - 9:k*10, :),'view','y','path','C:\Users\bluet\Documents\Capstone_New\OTS\tracking-algorithm\Accuracy and Performance\robot\data\ARTE4','floorlevel',-175,'base');
+        Robot.plot(Q(k*10 - 9:k*10, :));
+        hold off
         %Log control system accuracy
         Robot_Accuracy(:,k) = [X,Y,Z];
         angle_test(:,k) = [R,P,Y];
