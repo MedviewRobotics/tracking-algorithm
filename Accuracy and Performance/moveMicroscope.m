@@ -17,9 +17,9 @@
 %   OUPUTS:
 %       newq0 = output robot location, required as an input in the
 %           following initiation
-%       X = ?
-%       Y = ?
-%       Z = ?
+%       X,Y,Z = The end-effector end position calculated by fkine 
+%       R,P,Y = Roll, Pitch, Yaw values from rotation matrix to Euler.
+%       Q = joint space trajectory Q (MxN) where the joint coordinates vary from Q0 (1xN) to QF (1xN)
 
 function [newq0,x,y,z,R,P,Y,Q] = moveMicroscope(input_x,input_y,input_z,q0,AT03, eul)
 

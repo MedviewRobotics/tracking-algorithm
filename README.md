@@ -87,6 +87,7 @@ To get a local copy up and running follow these simple steps.
 * [MATLAB Computer Vision Toolbox](https://www.mathworks.com/help/vision/index.html?searchHighlight=Computer%20vision&s_tid=srchtitle) 
 * [MATLAB Image Processing Toolbox](https://www.mathworks.com/products/image.html?s_tid=srchtitle)
 * [MATLAB Communications Toolbox](https://www.mathworks.com/help/comm/index.html?s_tid=srchtitle)
+* [MATLAB Partial Differential Equations Toolbox](https://www.mathworks.com/products/pde.html#:~:text=Partial%20Differential%20Equation%20Toolbox%20lets,to%20explore%20and%20analyze%20them.)
 
 ### Installation
 

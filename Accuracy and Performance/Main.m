@@ -110,6 +110,7 @@ v = VideoWriter('accuracy.avi');
 v.FrameRate = 30;
 open(v)
 
+nFramesLeft = 100; %only for Demo4
 for k = 1:frames_skip:nFramesLeft
     tic %Starts pre-processing timer
 
@@ -165,20 +166,9 @@ for k = 1:frames_skip:nFramesLeft
         elapsed_2(k) = toc; %End find tip timer
 
         %Plotting in video player
-        rgb = insertShape(frameLeft,'rectangle',bboxLeft(1,:),'Color','black',...
-             'LineWidth',3);
-        rgb = insertShape(rgb,'rectangle',bboxLeft(2,:),'Color','black',...
-            'LineWidth',3);
-        rgb = insertShape(rgb,'rectangle',bboxLeft(3,:),'Color','black',...
-            'LineWidth',3);
-
-        rgb = insertText(rgb,centroidLeft(1,:) - 20,['X: ' num2str(round(point3d_1(1,k)),'%d')...
-            ' Y: ' num2str(round(point3d_1(2,k)),'%d') ' Z: ' num2str(round(point3d_1(3,k)))],'FontSize',18);
-        rgb = insertText(rgb,centroidLeft(2,:) + 50,['X: ' num2str(round(point3d_2(1,k)),'%d')...
-            ' Y: ' num2str(round(point3d_2(2,k)),'%d') ' Z: ' num2str(round(point3d_2(3,k)))],'FontSize',18);
-        rgb = insertText(rgb,centroidLeft(3,:) - 50,['X: ' num2str(round(point3d_3(1,k)),'%d')...
-            ' Y: ' num2str(round(point3d_3(2,k)),'%d') ' Z: ' num2str(round(point3d_3(3,k)))],'FontSize',18);
-
+       rgb = plotVideo(frameLeft,bboxLeft,centroidLeft,...
+                k,point3d_1,point3d_2,point3d_3);
+            
         player(rgb);
         writeVideo(v,rgb);
     end
@@ -202,7 +192,7 @@ for k = 1:frames_skip:nFramesLeft
         %Start control system timer
         tic;
         %Initiate control system
-        [q0,X,Y,Z,R,P,Y,Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul(:,k));
+        [q0,X,Y,Z,R,P,Ya,Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul(:,k));
         %Plotting
         model = createpde;
         g = importGeometry(model,'Instrument_Plotting_v9.stl');
@@ -212,7 +202,8 @@ for k = 1:frames_skip:nFramesLeft
         rotate(g, rad2deg(eul(2,k)),[0 0 0],[0 0 1]); %z-axis rotation
         translate(g, [xTip, yTip, zTip]);
         pdegplot(g)
-        Robot.plot(Q(k*10 - 9:k*10, :));
+        Robot.plot3d(Q(k*10 - 9:k*10, :),'view','y','path','C:\Users\bluet\Documents\Capstone_New\OTS\tracking-algorithm\Accuracy and Performance\robot\data\ARTE4','floorlevel',-175,'base');
+        %Robot.plot(Q(k*10 - 9:k*10, :));
         %Log control system accuracy
         Robot_Accuracy(:,k) = [X,Y,Z];
         angle_test(:,k) = [R,P,Y];
@@ -234,9 +225,6 @@ close(v);
 %     Joint5(count*10 - 9:10*count,1) = Q(:,5);
 %     Joint6(count*10 - 9:10*count,1) = Q(:,6);
 
-%% Test 
-
-
 %% Output performance metrics
 
 [T, Equiv_FPS_Rate] = systemPerformance(elapsed_1,elapsed_2, elapsed_3, elapsed_4);
@@ -245,7 +233,7 @@ fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 
 %% Output Accuracy Metrics
 %Vert 50
-TAcc = trackingAccuracy(surgicalTip_3D(1,:),50,Robot_Accuracy(2,:))
+TAcc = trackingAccuracy(surgicalTip_3D(2,:),50,Robot_Accuracy(3,:))
 disp(TAcc);
 
 %% Accuracy plots
