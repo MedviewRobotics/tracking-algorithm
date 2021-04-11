@@ -91,16 +91,17 @@ MotionNoise = [25, 10];
 % MotionNoise = [25, 10, 10];
 measurementNoise = 10;
 
+model = createpde;
+h = importGeometry(model,'brain.stl');
+rotate(h, -90,[0 0 0],[1 0 0]); %x-axis rotation
+rotate(h, -90,[0 0 0],[0 0 1]); %z-axis rotation
+translate(h, [-1233, 1521, 820]);
+pdegplot(h)
+
 %rot= zeros(3,nFramesLeft);
 [x_origin,y_origin,z_origin,eul_init] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
 [Robot,q0] = initializeMicroscope(x_origin,y_origin,z_origin,eul_init);
 
-model = createpde;
-h = importGeometry(model,'brain(100percent).stl');
-rotate(h, -90,[0 0 0],[1 0 0]); %x-axis rotation
-rotate(h, -90,[0 0 0],[0 0 1]); %z-axis rotation
-translate(h, [60, 85,95]);
-pdegplot(h)
 
 disp('Initialization Completed.');
 
@@ -116,7 +117,7 @@ v = VideoWriter('accuracy.avi');
 v.FrameRate = 30;
 open(v)
 
-nFramesLeft = 100; %only for Demo4
+nFramesLeft = 235; %only for Demo4
 for k = 1:frames_skip:nFramesLeft
     tic %Starts pre-processing timer
 
@@ -198,6 +199,7 @@ for k = 1:frames_skip:nFramesLeft
         tic;
         %Initiate control system
         [q0,X,Y,Z,R,P,Ya,Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul(:,k));
+        elapsed_4(k) = toc;
         %Plotting
         model = createpde;
         g = importGeometry(model,'Instrument_Plotting_v9.stl');
@@ -209,14 +211,12 @@ for k = 1:frames_skip:nFramesLeft
         pdegplot(h)
         hold on
         pdegplot(g)
-        %Robot.plot3d(Q(k*10 - 9:k*10, :),'view','y','path','C:\Users\bluet\Documents\Capstone_New\OTS\tracking-algorithm\Accuracy and Performance\robot\data\ARTE4','floorlevel',-175,'base');
-        Robot.plot(Q(k*10 - 9:k*10, :));
+        Robot.plot3d(Q(k*10 - 9:k*10, :),'view','y','path','C:\Users\ginet\OneDrive\Documents\MATLAB\Capstone\tracking-algorithm\Accuracy and Performance\robot\data\ARTE4','floorlevel',-175,'base');
+        %Robot.plot(Q(k*10 - 9:k*10, :));
         hold off
         %Log control system accuracy
         Robot_Accuracy(:,k) = [X,Y,Z];
-        angle_test(:,k) = [R,P,Y];
-        %End control system timer
-        elapsed_4(k) = toc;
+        angle_test(:,k) = [R,P,Ya];
     end
 
 end
