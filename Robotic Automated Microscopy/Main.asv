@@ -181,7 +181,7 @@ for k = 1:frames_skip:nFramesLeft
     end
 
     if rem(k, 5) == 0
-        %Start control system timer
+        %Start world2microscope timer
         tic;
 
         %Find location of microscope
@@ -191,10 +191,15 @@ for k = 1:frames_skip:nFramesLeft
 
         %Find location of tip in microscope coordinates
         [xTip, yTip, zTip] = world2Microscope_Accuracy(surgicalTip_3D(1, k), surgicalTip_3D(2, k), surgicalTip_3D(3, k), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
+
+        %End world2microscope timer
+        elapsed_3(k) = toc;
     
+        %Start control system timer
+        tic;
         %Initiate control system
         [q0,X,Y,Z,R,P,Ya,Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul(:,k));
-        elapsed_3(k) = toc;
+        elapsed_4(k) = toc;
         %Plotting
         model = createpde;
         g = importGeometry(model,'Instrument_Plotting_v9.stl');
@@ -230,7 +235,7 @@ close(v);
 
 %% Output performance metrics
 
-[T, Equiv_FPS_Rate] = systemPerformance(elapsed_1,elapsed_2, elapsed_3);
+[T, Equiv_FPS_Rate] = systemPerformance(elapsed_1,elapsed_2, elapsed_3, elapsed_4);
 disp(T);
 fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
 
