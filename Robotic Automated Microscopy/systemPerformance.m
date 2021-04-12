@@ -42,7 +42,7 @@ for i = 1:3
 end
 
 Avg_Time(1, 1) = sum(Avg_Time(2:4,:));
-Equiv_FPS_Rate = 1/(Avg_Time(1, 1));
+Equiv_FPS_Rate = 1/sum(Avg_Time(2:3,:));
 Stdv_Time(1, 1) = sqrt(sum((Stdv_Time(2:4,:)).^2));
 Max_Time(1, 1) = sum(Max_Time(2:4,:));
 Min_Time(1, 1) = sum(Min_Time(2:4,:));
