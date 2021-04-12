@@ -196,19 +196,19 @@ for k = 1:frames_skip:nFramesLeft
         [q0,X,Y,Z,R,P,Ya,Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul(:,k));
         elapsed_3(k) = toc;
         %Plotting
-        model = createpde;
-        g = importGeometry(model,'Instrument_Plotting_v9.stl');
-        rotate(g, 90,[0 0 0],[0 0 1]); %z-axis rotation to bring to 0 0 0
-        rotate(g, rad2deg(eul(3,k)),[0 0 0],[1 0 0]); %x-axis rotation
-        rotate(g, rad2deg(eul(1,k)),[0 0 0],[0 1 0]); %y-axis rotation
-        rotate(g, rad2deg(eul(2,k)),[0 0 0],[0 0 1]); %z-axis rotation
-        translate(g, [xTip, yTip, zTip]);
-        pdegplot(h)
-        hold on
-        pdegplot(g)
-        Robot.plot3d(Q(k*10 - 9:k*10, :),'view','y','path','C:\Users\ginet\OneDrive\Documents\MATLAB\Capstone\tracking-algorithm\Robotic Automated Microscopy\robot\data\ARTE4','floorlevel',-175,'base');
-        %Robot.plot(Q(k*10 - 9:k*10, :));
-        hold off
+%         model = createpde;
+%         g = importGeometry(model,'Instrument_Plotting_v9.stl');
+%         rotate(g, 90,[0 0 0],[0 0 1]); %z-axis rotation to bring to 0 0 0
+%         rotate(g, rad2deg(eul(3,k)),[0 0 0],[1 0 0]); %x-axis rotation
+%         rotate(g, rad2deg(eul(1,k)),[0 0 0],[0 1 0]); %y-axis rotation
+%         rotate(g, rad2deg(eul(2,k)),[0 0 0],[0 0 1]); %z-axis rotation
+%         translate(g, [xTip, yTip, zTip]);
+%         pdegplot(h)
+%         hold on
+%         pdegplot(g)
+%         Robot.plot3d(Q(k*10 - 9:k*10, :),'view','y','path','C:\Users\ginet\OneDrive\Documents\MATLAB\Capstone\tracking-algorithm\Robotic Automated Microscopy\robot\data\ARTE4','floorlevel',-175,'base');
+%         %Robot.plot(Q(k*10 - 9:k*10, :));
+%         hold off
         %Log control system accuracy
         Robot_Accuracy(:,k) = [X,Y,Z];
         angle_test(:,k) = [R,P,Ya];
@@ -219,20 +219,12 @@ end
 release(player)
 close(v);
 
-%% Joint stress testing
-
-%     Joint1(count*10 - 9:10*count,1) = Q(:,1);
-%     Joint2(count*10 - 9:10*count,1) = Q(:,2);
-%     Joint3(count*10 - 9:10*count,1) = Q(:,3);
-%     Joint4(count*10 - 9:10*count,1) = Q(:,4);
-%     Joint5(count*10 - 9:10*count,1) = Q(:,5);
-%     Joint6(count*10 - 9:10*count,1) = Q(:,6);
-
 %% Output performance metrics
 
-[T, Equiv_FPS_Rate] = systemPerformance(elapsed_1,elapsed_2, elapsed_3);
+[T, Equiv_FPS_Rate,Ctrl_Freq] = systemPerformance(elapsed_1,elapsed_2, elapsed_3);
 disp(T);
 fprintf('Equivalent FPS Rate: %3.2f \n', Equiv_FPS_Rate);
+fprintf('Control System Freq (Hz): %3.2f \n', Ctrl_Freq);
 
 %% Output Accuracy Metrics
 %Vert 50
