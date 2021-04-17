@@ -70,8 +70,8 @@ The high-level workflow of our system can be visualized as follows:
   </a>
 </p> 
 </br>
-</br>
 The system in this repository includes an object tracking algorithm as well as the robotic control system. The robotic structure is a 6DOF anthropomorphic arm carrying a microscope camera weighing approximately 55g at the end-effector. The .STL files of our custom-designed robot have been imported to the 3D MATLAB plot for visualization. The tracking algorithm comprises several object tracking steps and is able to process at a rate of 16 FPS. The designed control system achieves joint trajectory angles needed to actuate the robotic arm at a frequency rate of 29 Hz. Results indicate average accuracies of 87.2% for the designed tracking algorithm and 92.3% for our control system. The end-to-end system is able to successfully track a surgeon's surgical instrument movement and keep the microscope end-effector pointed at the surgical field of view for real time visualization on external TV monitors.
+</br>
 </br>
 <p align="center">
   <a href="https://github.com/MedviewRobotics/tracking-algorithm">
