@@ -66,7 +66,7 @@ The high-level workflow of our system can be visualized as follows:
 </br>
 <p align="center">
   <a href="https://github.com/MedviewRobotics/tracking-algorithm">
-    <img src="images/workflow.png" alt="Workflow" width="667" height="251">
+    <img src="images/SysOverview.png" alt="Workflow" width="667" height="251">
   </a>
 </p> 
 </br>
