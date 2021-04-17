@@ -75,7 +75,7 @@ The system in this repository includes an object tracking algorithm as well as t
 </br>
 <p align="center">
   <a href="https://github.com/MedviewRobotics/tracking-algorithm">
-    <img src="images/Control_System_Plot.png" alt="Workflow" width="720" height="363">
+    <img src="images/Control_System_Plot.png" alt="Workflow" width="418" height="300">
   </a>
   <a href="https://github.com/MedviewRobotics/tracking-algorithm">
     <img src="images/Optical_Tracking_System_Plot.png" alt="Workflow" width="554" height="311">
