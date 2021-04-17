@@ -55,7 +55,7 @@
 </br>
 <p align="center">
   <a href="https://github.com/MedviewRobotics/tracking-algorithm">
-    <img src="images/Assembly of Components v15.gif" alt="Animation of Project" width="640" height="271">
+    <img src="images/Assembly of Components v15 (2).gif" alt="Animation of Project" width="640" height="271">
   </a>
 </p>
 </br>
@@ -75,10 +75,10 @@ The system in this repository includes an object tracking algorithm as well as t
 </br>
 <p align="center">
   <a href="https://github.com/MedviewRobotics/tracking-algorithm">
-    <img src="images/Control_System_Plot.png" alt="Workflow" width="314" height="225">
+    <img src="images/Control_System_Plot.png" alt="Control System Plot" width="314" height="225">
   </a>
   <a href="https://github.com/MedviewRobotics/tracking-algorithm">
-    <img src="images/Optical_Tracking_System_Plot.png" alt="Workflow" width="407" height="225">
+    <img src="images/Optical_Tracking_System_Plot.png" alt="Optical Tracking System Plot" width="407" height="225">
   </a>
 </p> 
 </br>
