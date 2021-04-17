@@ -13,24 +13,8 @@ petercorkeinitialize();
 %% Initialize Tracking System Parameters
 tic; %Start initialize timer
 
-% addpath(genpath('March 31 Trials'));
-% load("stereoParamsMar31.mat");
 addpath(genpath('Accuracy Trials'));
 load("stereoParamsAccuracy.mat");
-%addpath(genpath('Trial 18-19'));
-%load("stereoParams18.mat");
-
-% readerLeft = VideoReader('myLeftTrialNormalMovement.avi');
-% readerRight = VideoReader('myRightTrialNormalMovement.avi');
-
-%readerLeft = VideoReader('myLeftTrialNormal8.avi');
-%readerRight = VideoReader('myRightTrialNormal8.avi');
-
-% readerLeft = VideoReader('myLeftTrialHoriz5cm.avi');
-% readerRight = VideoReader('myRightTrialHoriz5cm.avi');
-
-% readerLeft = VideoReader('myLeftTrialHoriz10cm.avi');
-% readerRight = VideoReader('myRightTrialHoriz10cm.avi');
 
 readerLeft = VideoReader('myLeftTrialVert5cm.avi');
 readerRight = VideoReader('myRightTrialVert5cm.avi');
@@ -87,8 +71,6 @@ pivotOffset = 200; % 20cm offset from midpoint btwn blue and green
 frames_skip = 1;
 initialEstimateError = [1 1]*1e5;
 MotionNoise = [25, 10];
-% initialEstimateError = [1 1 1]*1e5;
-% MotionNoise = [25, 10, 10];
 measurementNoise = 10;
 
 model = createpde;
@@ -101,7 +83,6 @@ pdegplot(h)
 %rot= zeros(3,nFramesLeft);
 [x_origin,y_origin,z_origin,eul_init] = findOrigin(mov,nFramesLeft,threshold,hblob,pivotOffset,stereoParams);
 [Robot,q0] = initializeMicroscope(x_origin,y_origin,z_origin,eul_init);
-
 
 disp('Initialization Completed.');
 
@@ -117,7 +98,6 @@ v = VideoWriter('accuracy.avi');
 v.FrameRate = 30;
 open(v)
 
-nFramesLeft = 235; %only for Demo4
 for k = 1:frames_skip:nFramesLeft
     tic %Starts pre-processing timer
 
@@ -186,7 +166,6 @@ for k = 1:frames_skip:nFramesLeft
 
         %Find location of microscope
         locationMicroscope = [surgicalTip_3D(1,k) - abs(50*normal(2)),surgicalTip_3D(2,k)-20,surgicalTip_3D(3,k)-abs(150*normal(1))];
-        %RECALL: X is Y in PLot, Z is X in PLot, Y is neg(Z) in Plot
         [xMicroscope, yMicroscope, zMicroscope] = world2Microscope_Accuracy(locationMicroscope(1), locationMicroscope(2), locationMicroscope(3), x_origin, y_origin, z_origin); %World to Microscope Coordinate Mapping
 
         %Find location of tip in microscope coordinates
@@ -196,21 +175,20 @@ for k = 1:frames_skip:nFramesLeft
         [q0,X,Y,Z,R,P,Ya,Q(k*10 - 9:k*10, :)] = moveMicroscope(xMicroscope, yMicroscope, zMicroscope, q0, Robot,eul(:,k));
         elapsed_3(k) = toc;
         %Plotting
-%         model = createpde;
-%         g = importGeometry(model,'Instrument_Plotting_v9.stl');
-%         rotate(g, 90,[0 0 0],[0 0 1]); %z-axis rotation to bring to 0 0 0
-%         rotate(g, rad2deg(eul(3,k)),[0 0 0],[1 0 0]); %x-axis rotation
-%         rotate(g, rad2deg(eul(1,k)),[0 0 0],[0 1 0]); %y-axis rotation
-%         rotate(g, rad2deg(eul(2,k)),[0 0 0],[0 0 1]); %z-axis rotation
-%         translate(g, [xTip, yTip, zTip]);
-%         pdegplot(h)
-%         hold on
-%         pdegplot(g)
-%         Robot.plot3d(Q(k*10 - 9:k*10, :),'view','y','path','C:\Users\ginet\OneDrive\Documents\MATLAB\Capstone\tracking-algorithm\Robotic Automated Microscopy\robot\data\ARTE4','floorlevel',-175,'base');
-%         %Robot.plot(Q(k*10 - 9:k*10, :));
-%         hold off
-        %Log control system accuracy
-        Robot_Accuracy(:,k) = [X,Y,Z];
+        model = createpde;
+        g = importGeometry(model,'Instrument_Plotting_v9.stl');
+        rotate(g, 90,[0 0 0],[0 0 1]); %z-axis rotation to bring to 0 0 0
+        rotate(g, rad2deg(eul(3,k)),[0 0 0],[1 0 0]); %x-axis rotation
+        rotate(g, rad2deg(eul(1,k)),[0 0 0],[0 1 0]); %y-axis rotation
+        rotate(g, rad2deg(eul(2,k)),[0 0 0],[0 0 1]); %z-axis rotation
+        translate(g, [xTip, yTip, zTip]);
+        pdegplot(h)
+        hold on
+        pdegplot(g)
+        Robot.plot3d(Q(k*10 - 9:k*10, :),'view','y','path','C:\Users\ginet\OneDrive\Documents\MATLAB\Capstone\tracking-algorithm\Robotic Automated Microscopy\robot\data\ARTE4','floorlevel',-175,'base');
+        hold off
+        
+        Robot_Accuracy(:,k) = [X,Y,Z];%Log control system accuracy
         angle_test(:,k) = [R,P,Ya];
     end
 
@@ -230,100 +208,3 @@ fprintf('Control System Freq (Hz): %3.2f \n', Ctrl_Freq);
 %Vert 50
 TAcc = trackingAccuracy(surgicalTip_3D(2,:),50,Robot_Accuracy(3,:))
 disp(TAcc);
-
-%% Accuracy plots
-lower = 7;
-upper = 235;
-
-figure;
-subplot(321)
-plot(surgicalTip_3D(1,lower:upper));
-title('Surgical Tip Position X');
-subplot(322)
-plot(Robot_Accuracy(2,lower:upper));
-title('Robot Effector Tip Position Y (Tracking X)');
-subplot(323)
-plot(surgicalTip_3D(2,lower:upper));
-title('Surgical Tip Position Y');
-subplot(324)
-plot(Robot_Accuracy(3,lower:upper));
-title('Robot Effector Tip Position Z (Tracking Y)');
-subplot(325)
-plot(surgicalTip_3D(3,lower:upper));
-title('Surgical Tip Position Z');
-subplot(326)
-plot(Robot_Accuracy(1,lower:upper));
-title('Normalized Surgical Tip Position X (Tracking Z)');
-
-figure
-subplot(321)
-plot(point3d_1(1, lower:upper))
-title('Raw Green Marker X')
-subplot(322)
-plot(trackedLocation_1(1, lower:upper))
-title('Tracked Green Marker X')
-subplot(323)
-plot(point3d_1(2, lower:upper))
-title('Raw Green Marker Y')
-subplot(324)
-plot(trackedLocation_1(2, lower:upper))
-title('Tracked Green Marker Y')
-subplot(325)
-plot(point3d_1(3, lower:upper))
-title('Raw Green Marker Z')
-subplot(326)
-plot(trackedLocation_1(3, lower:upper))
-title('Tracked Green Marker Z')
-
-figure
-subplot(321)
-plot(point3d_2(1, lower:upper))
-title('Raw Blue Marker X')
-subplot(322)
-plot(trackedLocation_2(1, lower:upper))
-title('Tracked Blue Marker X')
-subplot(323)
-plot(point3d_2(2, lower:upper))
-title('Raw Blue Marker Y')
-subplot(324)
-plot(trackedLocation_2(2, lower:upper))
-title('Tracked Blue Marker Y')
-subplot(325)
-plot(point3d_2(3, lower:upper))
-title('Raw Blue Marker Z')
-subplot(326)
-plot(trackedLocation_2(3, lower:upper))
-title('Tracked Blue Marker Z')
-
-figure
-subplot(321)
-plot(point3d_3(1, lower:upper))
-title('Raw Red Marker X')
-subplot(322)
-plot(trackedLocation_3(1, lower:upper))
-title('Tracked Red Marker X')
-subplot(323)
-plot(point3d_3(2, 52:150))
-title('Raw Red Marker Y')
-subplot(324)
-plot(trackedLocation_3(2, lower:upper))
-title('Tracked Red Marker Y')
-subplot(325)
-plot(point3d_3(3, 52:150))
-title('Raw Red Marker Z')
-subplot(326)
-plot(trackedLocation_3(3, lower:upper))
-title('Tracked Red Marker Z')
-
-%% Ginette orientation mess-around
-
-locationMicroscope = surgicalTip_3D(:,k) + normal(:)*60;
-
-figure
-plot3(point3d_1(1,k), point3d_1(2,k), point3d_1(3,k), '.g');
-hold on
-plot3(point3d_2(1,k), point3d_2(2,k), point3d_2(3,k), '.r');
-plot3(point3d_3(1,k), point3d_3(2,k), point3d_3(3,k), '.b');
-plot3(surgicalTip_3D(1,k), surgicalTip_3D(2,k), surgicalTip_3D(3,k), '.m');
-plot3(locationMicroscope(1), locationMicroscope(2), locationMicroscope(3), '.c');
-hold off
