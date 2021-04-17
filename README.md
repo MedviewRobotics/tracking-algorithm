@@ -148,7 +148,7 @@ We would also like to extend our appreciation to our Biomedical Image Analysis P
 
 Additionally, we would like to sincerely thank Josh Richmond of Synaptive Medical for his insight into the challenges and intricacies of the surgical system navigation industry. His emphasis on an iterative approach to product development was extremely helpful throughout the course of this project.
 
-
+Lastly, we wanted to thank Peter Corke, the creator of the Robotics Toolbox and the author of the “Robotics, Vision & Control”. The open-source toolbox provided many functions that were useful for the study and simulation of classical arm-type robotics. It was critical when performing kinematics, and trajectory generation.
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
